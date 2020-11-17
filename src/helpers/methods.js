@@ -11,3 +11,11 @@ export const bufferize = (func, delay) => {
     }, delay);
   };
 };
+
+export const sum = (array) => {
+  let res = 0;
+  array.forEach((_) => (res += _));
+  return res;
+};
+
+export const avg = (array) => sum(array) / array.length;

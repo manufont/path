@@ -7,14 +7,73 @@ const MapboxContext = React.createContext();
 const OriginalProvider = MapboxContext.Provider;
 
 const enhanceMap = (map) => {
+  const canvas = map.getCanvas();
   map.onLayerClick = (layerId, onClick) => {
     map.on("mouseenter", layerId, function () {
-      map.getCanvas().style.cursor = "pointer";
+      canvas.style.cursor = "pointer";
     });
     map.on("mouseleave", layerId, function () {
-      map.getCanvas().style.cursor = "";
+      canvas.style.cursor = "";
     });
     map.on("click", layerId, onClick);
+  };
+
+  map.makeLayerDraggable = (layerId, onDragMove, onDragEnd) => {
+    let feature = null;
+
+    const onMove = (e) => {
+      canvas.style.cursor = "grabbing";
+      onDragMove(e, feature);
+    };
+
+    const onUp = (e) => {
+      // Unbind mouse/touch events
+      map.off("mousemove", onMove);
+      map.off("touchmove", onMove);
+
+      onDragEnd(e, feature);
+      feature = null;
+      canvas.style.cursor = "";
+    };
+
+    const onLayerMouseEnter = () => {
+      canvas.style.cursor = "move";
+    };
+
+    const onLayerMouseLeave = () => {
+      canvas.style.cursor = "";
+    };
+
+    const onLayerMouseDown = (e) => {
+      feature = e.features[0];
+      e.preventDefault();
+      canvas.style.cursor = "grab";
+      map.on("mousemove", onMove);
+      map.once("mouseup", onUp);
+    };
+
+    const onLayerTouchStart = (e) => {
+      if (e.points.length !== 1) return;
+      feature = e.features[0];
+
+      // Prevent the default map drag behavior.
+      e.preventDefault();
+
+      map.on("touchmove", onMove);
+      map.once("touchend", onUp);
+    };
+
+    map.on("mouseenter", layerId, onLayerMouseEnter);
+    map.on("mouseleave", layerId, onLayerMouseLeave);
+    map.on("mousedown", layerId, onLayerMouseDown);
+    map.on("touchstart", layerId, onLayerTouchStart);
+
+    return () => {
+      map.off("mouseenter", layerId, onLayerMouseEnter);
+      map.off("mouseleave", layerId, onLayerMouseLeave);
+      map.off("mousedown", layerId, onLayerMouseDown);
+      map.off("touchstart", layerId, onLayerTouchStart);
+    };
   };
   return map;
 };
