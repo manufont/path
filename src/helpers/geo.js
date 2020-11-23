@@ -1,3 +1,5 @@
+import { minBy } from "./methods";
+
 export const latLngCmp = (latLngA, latLngB) =>
   latLngA[0] === latLngB[0] && latLngA[1] === latLngB[1];
 
@@ -24,3 +26,19 @@ export const franceBounds = [
   [-5.5591, 41.31433],
   [9.662499, 51.1241999],
 ];
+
+export const distance = (pointA, pointB) => {
+  const [lonA, latA] = pointA;
+  const [lonB, latB] = pointB;
+  return Math.sqrt(Math.pow(lonA - lonB, 2) + Math.pow(latA - latB, 2));
+};
+
+export const closestPoint = (polyline, point) => minBy(polyline, (_) => distance(_, point));
+
+export const pointsCmp = (pointsA, pointsB) => {
+  if (pointsA.length !== pointsB.length) return false;
+  for (let i = 0; i < pointsA.length; ++i) {
+    if (!latLngCmp(pointsA[i], pointsB[i])) return false;
+  }
+  return true;
+};
