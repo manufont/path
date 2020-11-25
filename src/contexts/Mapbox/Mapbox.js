@@ -18,8 +18,10 @@ const enhanceMap = (map) => {
     map.on("click", layerId, onClick);
   };
 
-  map.makeLayerDraggable = (layerId, onDragMove, onDragEnd) => {
+  map.makeLayerDraggable = (layerId, onDragMove, onDragEnd, onClick) => {
     let feature = null;
+    let point = null;
+    let timeDown = null;
 
     const onMove = (e) => {
       canvas.style.cursor = "grabbing";
@@ -31,9 +33,23 @@ const enhanceMap = (map) => {
       map.off("mousemove", onMove);
       map.off("touchmove", onMove);
 
-      onDragEnd(e, feature);
+      const delay = Date.now() - timeDown;
+      if (e.point.x === point.x && e.point.y === point.y && delay < 200 && onClick) {
+        onClick(e, feature);
+      } else {
+        onDragEnd(e, feature);
+      }
       feature = null;
+      point = null;
+      timeDown = null;
       canvas.style.cursor = "";
+    };
+
+    const onDown = (e) => {
+      e.preventDefault();
+      feature = e.features[0];
+      point = e.point;
+      timeDown = Date.now();
     };
 
     const onLayerMouseEnter = () => {
@@ -45,19 +61,16 @@ const enhanceMap = (map) => {
     };
 
     const onLayerMouseDown = (e) => {
-      feature = e.features[0];
-      e.preventDefault();
+      onDown(e);
       canvas.style.cursor = "grab";
+
       map.on("mousemove", onMove);
       map.once("mouseup", onUp);
     };
 
     const onLayerTouchStart = (e) => {
       if (e.points.length !== 1) return;
-      feature = e.features[0];
-
-      // Prevent the default map drag behavior.
-      e.preventDefault();
+      onDown(e);
 
       map.on("touchmove", onMove);
       map.once("touchend", onUp);

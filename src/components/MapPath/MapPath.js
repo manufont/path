@@ -52,14 +52,14 @@ const MapWaypoints = ({ waypoints, setWaypoints }) => {
       const { lat, lng } = e.lngLat;
       const newWaypoints = [...waypoints];
       newWaypoints[waypoint.id] = [lng, lat];
-      setWaypoints(newWaypoints);
+      setWaypoints(newWaypoints, true);
     };
 
-    const onClick = (e) => {
-      e.originalEvent.preventDefault();
-      e.originalEvent.stopPropagation();
-      const waypoint = e.features[0];
-      setWaypoints(waypoints.filter((_, index) => index !== waypoint.id));
+    const onClick = (e, waypoint) => {
+      setWaypoints(
+        waypoints.filter((_, index) => index !== waypoint.id),
+        true
+      );
     };
 
     return map.makeLayerDraggable("waypoints-layer", onDragMove, onDragEnd, onClick);
@@ -111,7 +111,7 @@ const MapLocation = ({ location, setLocation }) => {
 
     const onDragEnd = (e) => {
       const { lat, lng } = e.lngLat;
-      setLocation([lng, lat]);
+      setLocation([lng, lat], true);
     };
 
     return map.makeLayerDraggable("location-layer", onDragMove, onDragEnd);
@@ -185,6 +185,7 @@ const MapPolyline = ({ path }) => {
 
   useEffect(() => {
     return () => {
+      if (!map) return;
       map.removeLayer("polyline-background-layer");
       map.removeLayer("polyline-layer");
       map.removeSource("polyline");
@@ -202,15 +203,12 @@ const MapPath = ({ location, setLocation, waypoints, setWaypoints, path }) => {
       const [feature] = map.queryRenderedFeatures(e.point);
       switch (feature && feature.source) {
         case "waypoints":
-          e.originalEvent.stopPropagation();
-          setWaypoints(waypoints.filter((_, index) => index !== feature.id));
-          return;
         case "location":
           e.originalEvent.stopPropagation();
           return;
         default:
           const lngLat = e.lngLat.toArray();
-          setWaypoints([...waypoints, lngLat]);
+          setWaypoints([...waypoints, lngLat], true);
       }
     };
 

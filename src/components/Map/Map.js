@@ -1,5 +1,6 @@
 import React, { useEffect, useContext, useMemo } from "react";
 import polyline from "@mapbox/polyline";
+import lzString from "lz-string";
 
 import { SearchBox, MapPath } from "components";
 import { Mapbox } from "contexts";
@@ -14,6 +15,8 @@ window.polyline = polyline;
 const MAPBOX_STYLE = process.env.REACT_APP_MAPBOX_STYLE;
 
 const PATH_PRECISION = 5;
+
+window.lzString = lzString;
 
 const uriBtoa = (str) => btoa(str).replace(/=/g, "~").replace(/\//g, ".");
 const uriAtob = (str) => atob(str.replace(/~/g, " ").replace(/\./g, "/"));
@@ -102,7 +105,7 @@ const Map = () => {
             if (place.properties.extent) {
               newBounds = getBoundsFromPlace(place);
             }
-            setLocation(newLocation);
+            setLocation(newLocation, true);
             setWaypoints([]);
             setBounds(newBounds);
           }}

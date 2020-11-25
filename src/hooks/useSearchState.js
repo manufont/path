@@ -1,9 +1,6 @@
-import { useState, useCallback, useMemo, useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import { useCallback, useMemo } from "react";
+import { useHistory, useLocation } from "react-router-dom";
 import * as queryString from "query-string";
-
-import { bufferize } from "helpers/methods";
-import usePrevious from "./usePrevious";
 
 const noopEncoder = {
   encode: (_) => _,
@@ -15,43 +12,24 @@ const noopEncoder = {
 // encoder must change as little as possible to prevent unwanted setter update.
 // encoder is a { encode, decode } object that translate value object into a URI-complient string
 // controlled determine whether or not this hook should take control over the value. See https://fr.reactjs.org/docs/uncontrolled-components.html for more.
-const useSearchState = (searchParam, defaultValue, encoder = noopEncoder, controlled = true) => {
-  const history = useHistory();
-  const searchObj = queryString.parse(history.location.search);
+const useSearchState = (searchParam, defaultValue, encoder = noopEncoder) => {
+  const { search } = useLocation();
+  const searchObj = queryString.parse(search);
   const searchValue = searchObj[searchParam];
-  const prevDefaultValue = usePrevious(defaultValue);
-  const prevEncoder = usePrevious(encoder);
-  const [value, setValue] = useState(
-    searchValue === undefined ? defaultValue : encoder.decode(searchValue)
+  const value = useMemo(
+    () => (searchValue === undefined ? defaultValue : encoder.decode(searchValue)),
+    [defaultValue, encoder, searchValue]
   );
+  const history = useHistory();
 
   const getNewLocation = useCallback(
     (value) => {
       const searchObj = queryString.parse(history.location.search);
-      const newSearchObj = {
-        ...searchObj,
-        [searchParam]: value,
-      };
+      const newSearchObj = { ...searchObj, [searchParam]: value };
       const search = queryString.stringify(newSearchObj);
-      return { ...history.location, search };
+      return { ...history.location, search, state: { origin: "useSearchState" } };
     },
     [searchParam, history]
-  );
-
-  const pushValue = useMemo(
-    () =>
-      bufferize((value) => {
-        history.push(getNewLocation(value));
-      }, 100),
-    [history, getNewLocation]
-  );
-
-  const replaceValue = useMemo(
-    () =>
-      bufferize((value) => {
-        history.replace(getNewLocation(value));
-      }, 100),
-    [history, getNewLocation]
   );
 
   const setter = useCallback(
@@ -59,26 +37,11 @@ const useSearchState = (searchParam, defaultValue, encoder = noopEncoder, contro
       const newEncodedValue = encoder.encode(newValue);
       const encodedDefaultValue = encoder.encode(defaultValue);
       const isDefault = newEncodedValue === encodedDefaultValue;
-      const updateValue = push ? pushValue : replaceValue;
-      updateValue(isDefault ? undefined : newEncodedValue);
-      if (controlled) {
-        setValue(newValue);
-      }
+      const updateValue = push ? history.push : history.replace;
+      updateValue(getNewLocation(isDefault ? undefined : newEncodedValue));
     },
-    [controlled, defaultValue, encoder, pushValue, replaceValue]
+    [defaultValue, encoder, getNewLocation, history]
   );
-
-  // If defaultValue change but value doesn't, we need to check if value was set to defaultValue.
-  // If true, we need to set it to the new defaultValue.
-  useEffect(() => {
-    if (!prevDefaultValue || !prevEncoder || prevDefaultValue === defaultValue) return;
-    const encodedValue = prevEncoder.encode(value);
-    const encodedPrevDefaultValue = prevEncoder.encode(prevDefaultValue);
-    const wasDefault = encodedValue === encodedPrevDefaultValue;
-    if (wasDefault && controlled) {
-      setValue(defaultValue);
-    }
-  }, [searchParam, defaultValue, prevDefaultValue, value, prevEncoder, controlled]);
 
   return [value, setter];
 };
