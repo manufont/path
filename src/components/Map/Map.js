@@ -1,8 +1,7 @@
 import React, { useEffect, useContext, useMemo } from "react";
 import polyline from "@mapbox/polyline";
-import lzString from "lz-string";
 
-import { SearchBox, MapPath } from "components";
+import { SearchBox, MapPath, PathDetails } from "components";
 import { Mapbox } from "contexts";
 import { useSearchState, usePath } from "hooks";
 import { boundsEncoder, latLngEncoder, boundsCmp, franceBounds } from "helpers/geo";
@@ -10,13 +9,9 @@ import { first } from "helpers/methods";
 
 import styles from "./Map.module.css";
 
-window.polyline = polyline;
-
 const MAPBOX_STYLE = process.env.REACT_APP_MAPBOX_STYLE;
 
 const PATH_PRECISION = 5;
-
-window.lzString = lzString;
 
 const uriBtoa = (str) => btoa(str).replace(/=/g, "~").replace(/\//g, ".");
 const uriAtob = (str) => atob(str.replace(/~/g, " ").replace(/\./g, "/"));
@@ -110,6 +105,7 @@ const Map = () => {
             setBounds(newBounds);
           }}
         />
+        {path && <PathDetails path={path} />}
       </div>
       <Mapbox.Provider options={mapOptions} style={{ flex: 1 }}>
         <BoundsMapping bounds={bounds} setBounds={setBounds} />
