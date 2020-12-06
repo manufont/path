@@ -4,18 +4,23 @@ import polyline from "@mapbox/polyline";
 import { first } from "helpers/methods";
 import useResource, { addCacheEntry } from "./useResource";
 
-const parsePathResults = (results) => ({
-  ...results,
-  trip: {
-    ...results.trip,
-    legs: results.trip.legs.map((leg) => ({
-      ...leg,
-      decodedShape: polyline.decode(leg.shape, 6).map(([lat, lng]) => [lng, lat]),
-    })),
-  },
-});
+const VALHALLA_URL = process.env.REACT_APP_VALHALLA_URL;
 
-const getPathUrl = (startPoint, waypoints) => {
+const parsePathResults = (results) => {
+  if (!results.trip) return null;
+  return {
+    ...results,
+    trip: {
+      ...results.trip,
+      legs: results.trip.legs.map((leg) => ({
+        ...leg,
+        decodedShape: polyline.decode(leg.shape, 6).map(([lat, lng]) => [lng, lat]),
+      })),
+    },
+  };
+};
+
+const getPathUrl = (startPoint, waypoints, speed) => {
   if (waypoints.length === 0) return null;
   const params = {
     costing: "pedestrian",
@@ -24,15 +29,20 @@ const getPathUrl = (startPoint, waypoints) => {
       lat: point[1],
       options: { allowUTurn: true },
     })),
+    costing_options: {
+      pedestrian: {
+        walking_speed: speed,
+      },
+    },
   };
-  return `/valhalla/route?json=${JSON.stringify(params)}`;
+  return `${VALHALLA_URL}/route?json=${JSON.stringify(params)}`;
 };
 
 const getWaypointsFromPath = (path) =>
   path.trip.legs.map((leg) => first(leg.decodedShape)).slice(1);
 
-const usePath = (startPoint, waypoints) => {
-  const url = getPathUrl(startPoint, waypoints);
+const usePath = (startPoint, waypoints, speed) => {
+  const url = getPathUrl(startPoint, waypoints, speed);
   const [results, loading] = useResource(url);
 
   const path = useMemo(() => {
@@ -40,10 +50,10 @@ const usePath = (startPoint, waypoints) => {
     const path = parsePathResults(results);
     if (path) {
       const correctedWaypoints = getWaypointsFromPath(path);
-      addCacheEntry(getPathUrl(startPoint, correctedWaypoints), results);
+      addCacheEntry(getPathUrl(startPoint, correctedWaypoints, speed), results);
     }
     return path;
-  }, [results, startPoint]);
+  }, [results, startPoint, speed]);
 
   return [path, loading];
 };

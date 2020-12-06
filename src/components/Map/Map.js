@@ -3,9 +3,10 @@ import polyline from "@mapbox/polyline";
 
 import { SearchBox, MapPath, PathDetails } from "components";
 import { Mapbox } from "contexts";
-import { useSearchState, usePath } from "hooks";
+import { useSearchState, usePath, useTitle } from "hooks";
 import { boundsEncoder, latLngEncoder, boundsCmp, franceBounds } from "helpers/geo";
 import { first } from "helpers/methods";
+import { photonToString } from "helpers/photon";
 
 import styles from "./Map.module.css";
 
@@ -19,6 +20,11 @@ const uriAtob = (str) => atob(str.replace(/~/g, " ").replace(/\./g, "/"));
 const pathEncoder = {
   encode: (path) => uriBtoa(polyline.encode(path, PATH_PRECISION)),
   decode: (str) => polyline.decode(uriAtob(str), PATH_PRECISION),
+};
+
+const numberEncoder = {
+  encode: (nb) => String(nb),
+  decode: (str) => parseFloat(str),
 };
 
 const defaultPath = [];
@@ -39,6 +45,17 @@ const lngLatToBounds = (lngLat) => {
     [lng - lngE, lat - latE],
     [lng + lngE, lat + latE],
   ];
+};
+
+const getTitle = (path, locationText) => {
+  if (!locationText) {
+    return "ManuPath";
+  }
+  if (!path) {
+    return `${locationText} - ManuPath`;
+  }
+  const distanceText = path.trip.summary.length.toFixed(1) + " km";
+  return `${distanceText} near ${locationText} - ManuPath`;
 };
 
 const BoundsMapping = ({ bounds, setBounds }) => {
@@ -71,7 +88,11 @@ const Map = () => {
   const [bounds, setBounds] = useSearchState("b", franceBounds, boundsEncoder);
   const [location, setLocation] = useSearchState("l", null, latLngEncoder);
   const [waypoints, setWaypoints] = useSearchState("p", defaultPath, pathEncoder);
-  const [path] = usePath(location, waypoints);
+  const [locationText, setLocationText] = useSearchState("q", "");
+  const [speed, setSpeed] = useSearchState("s", 10, numberEncoder);
+  const [path] = usePath(location, waypoints, speed);
+
+  useTitle(getTitle(path, locationText));
 
   useEffect(() => {
     if (!path) return;
@@ -93,6 +114,7 @@ const Map = () => {
     <div className={styles.mapContainer}>
       <div className={styles.searchBox}>
         <SearchBox
+          defaultSearchText={locationText}
           onPlaceSelect={(place) => {
             if (!place) return;
             const newLocation = place.geometry.coordinates;
@@ -100,24 +122,23 @@ const Map = () => {
             if (place.properties.extent) {
               newBounds = getBoundsFromPlace(place);
             }
+            setLocationText(photonToString(place));
             setLocation(newLocation, true);
             setWaypoints([]);
             setBounds(newBounds);
           }}
         />
-        {path && <PathDetails path={path} />}
+        <PathDetails path={path} speed={speed} setSpeed={setSpeed} />
       </div>
       <Mapbox.Provider options={mapOptions} style={{ flex: 1 }}>
         <BoundsMapping bounds={bounds} setBounds={setBounds} />
-        {location && (
-          <MapPath
-            location={location}
-            setLocation={setLocation}
-            waypoints={waypoints}
-            setWaypoints={setWaypoints}
-            path={path}
-          />
-        )}
+        <MapPath
+          location={location}
+          setLocation={setLocation}
+          waypoints={waypoints}
+          setWaypoints={setWaypoints}
+          path={path}
+        />
       </Mapbox.Provider>
     </div>
   );

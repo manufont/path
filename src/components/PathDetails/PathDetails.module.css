@@ -1,0 +1,22 @@
+.summary {
+  align-items: center;
+}
+
+.speedContainer {
+  display: flex;
+  flex: 1;
+  margin: 0 -8px;
+  align-items: center;
+}
+
+.speedContainer > * {
+  margin: 0 8px;
+}
+
+.slider {
+  flex: 1;
+}
+
+.shareButton {
+  margin-left: auto;
+}

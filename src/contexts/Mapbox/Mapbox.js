@@ -88,6 +88,18 @@ const enhanceMap = (map) => {
       map.off("touchstart", layerId, onLayerTouchStart);
     };
   };
+
+  map.safeRemoveLayer = (layerId) => {
+    if (map && map.getLayer(layerId)) {
+      map.removeLayer(layerId);
+    }
+  };
+
+  map.safeRemoveSource = (sourceId) => {
+    if (map && map.getSource(sourceId)) {
+      map.removeSource(sourceId);
+    }
+  };
   return map;
 };
 
