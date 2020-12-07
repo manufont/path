@@ -33,21 +33,24 @@ const PathDetails = ({ path, speed, setSpeed }) => {
   const share = () => {
     navigator.share({
       title: document.title,
-      url: document.url,
+      url: document.URL,
     });
   };
 
   return (
     <Accordion>
-      <AccordionSummary expandIcon={<ExpandMoreIcon />} className={styles.summary}>
-        <Typography variant="h6">
-          <strong>{length.toFixed(1)} km</strong>, {formatDuration(time)}
-        </Typography>
-        {navigator.share && (
-          <IconButton className={styles.shareButton} onClick={share}>
-            <ShareIcon />
-          </IconButton>
-        )}
+      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+        <div className={styles.summary}>
+          <Typography variant="h6">
+            <strong>{length.toFixed(1)} km</strong>, {formatDuration(time)}
+          </Typography>
+          {navigator.share ||
+            (true && (
+              <IconButton className={styles.shareButton} onClick={share}>
+                <ShareIcon />
+              </IconButton>
+            ))}
+        </div>
       </AccordionSummary>
       <AccordionDetails>
         <div className={styles.speedContainer}>
