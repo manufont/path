@@ -3,12 +3,14 @@ import Accordion from "@material-ui/core/Accordion";
 import AccordionDetails from "@material-ui/core/AccordionDetails";
 import AccordionSummary from "@material-ui/core/AccordionSummary";
 import InputAdornment from "@material-ui/core/InputAdornment";
+import Snackbar from "@material-ui/core/Snackbar";
 import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import ShareIcon from "@material-ui/icons/Share";
 import Slider from "@material-ui/core/Slider";
 import Input from "@material-ui/core/Input";
+import MuiAlert from "@material-ui/lab/Alert";
 import RunFastIcon from "mdi-material-ui/RunFast";
 
 import { formatDuration } from "helpers/date";
@@ -16,9 +18,26 @@ import { useBufferedState } from "hooks";
 
 import styles from "./PathDetails.module.css";
 
+const copyUrlToClipboard = () => {
+  const dummy = document.createElement("input");
+  document.body.appendChild(dummy);
+  dummy.value = document.URL;
+  dummy.select();
+  document.execCommand("copy");
+  document.body.removeChild(dummy);
+};
+
+const share = () => {
+  navigator.share({
+    title: document.title,
+    url: document.URL,
+  });
+};
+
 const PathDetails = ({ path, speed, setSpeed }) => {
   const [memoPath, setMemoPath] = useState(path);
   const [instantSpeed, setInstantSpeed] = useBufferedState(speed, setSpeed, 200);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
 
   useEffect(() => {
     if (path) {
@@ -30,11 +49,19 @@ const PathDetails = ({ path, speed, setSpeed }) => {
   const { summary } = memoPath.trip;
   const { length, time } = summary;
 
-  const share = () => {
-    navigator.share({
-      title: document.title,
-      url: document.URL,
-    });
+  const onShareClick = (e) => {
+    e.stopPropagation();
+    if (navigator.share) {
+      share();
+    } else {
+      copyUrlToClipboard();
+      setSnackbarOpen(true);
+    }
+  };
+
+  const closeSnackbar = (e) => {
+    e && e.stopPropagation();
+    setSnackbarOpen(false);
   };
 
   return (
@@ -44,11 +71,14 @@ const PathDetails = ({ path, speed, setSpeed }) => {
           <Typography variant="h6">
             <strong>{length.toFixed(1)} km</strong>, {formatDuration(time)}
           </Typography>
-          {navigator.share && (
-            <IconButton className={styles.shareButton} onClick={share}>
-              <ShareIcon />
-            </IconButton>
-          )}
+          <IconButton className={styles.shareButton} onClick={onShareClick}>
+            <ShareIcon />
+          </IconButton>
+          <Snackbar open={snackbarOpen} autoHideDuration={2000} onClose={closeSnackbar}>
+            <MuiAlert variant="filled" onClose={closeSnackbar} severity="success">
+              URL copied to clipboard !
+            </MuiAlert>
+          </Snackbar>
         </div>
       </AccordionSummary>
       <AccordionDetails>

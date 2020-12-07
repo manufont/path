@@ -11,7 +11,6 @@ const noopEncoder = {
 // defaultValue must change as little as possible : if value is set to default, it will be updated when default value change.
 // encoder must change as little as possible to prevent unwanted setter update.
 // encoder is a { encode, decode } object that translate value object into a URI-complient string
-// controlled determine whether or not this hook should take control over the value. See https://fr.reactjs.org/docs/uncontrolled-components.html for more.
 const useSearchState = (searchParam, defaultValue, encoder = noopEncoder) => {
   const { search } = useLocation();
   const searchObj = queryString.parse(search);

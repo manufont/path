@@ -34,8 +34,8 @@ const SearchBox = ({ mapCenter, onPlaceSelect, defaultSearchText }) => {
   }, [searchText, bufferizedSetSearchUrl, mapCenter]);
 
   return (
-    <Card>
-      <CardContent>
+    <Card className={styles.root}>
+      <CardContent className={styles.cardContent}>
         <Autocomplete
           freeSolo
           options={photons || []}
