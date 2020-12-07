@@ -32,8 +32,8 @@ const PathDetails = ({ path, speed, setSpeed }) => {
 
   const share = () => {
     navigator.share({
-      title: "ManuPath",
-      url: document.title,
+      title: document.title,
+      url: document.url,
     });
   };
 
