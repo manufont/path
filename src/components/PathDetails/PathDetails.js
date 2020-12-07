@@ -44,12 +44,11 @@ const PathDetails = ({ path, speed, setSpeed }) => {
           <Typography variant="h6">
             <strong>{length.toFixed(1)} km</strong>, {formatDuration(time)}
           </Typography>
-          {navigator.share ||
-            (true && (
-              <IconButton className={styles.shareButton} onClick={share}>
-                <ShareIcon />
-              </IconButton>
-            ))}
+          {navigator.share && (
+            <IconButton className={styles.shareButton} onClick={share}>
+              <ShareIcon />
+            </IconButton>
+          )}
         </div>
       </AccordionSummary>
       <AccordionDetails>
