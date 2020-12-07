@@ -8,10 +8,8 @@ import { boundsEncoder, latLngEncoder, boundsCmp, franceBounds } from "helpers/g
 import { first } from "helpers/methods";
 import { photonToString } from "helpers/photon";
 
+import mapboxStyle from "./mapboxStyle";
 import styles from "./Map.module.css";
-
-const MAPBOX_STYLE = process.env.REACT_APP_MAPBOX_STYLE;
-const TILE_SERVER_URL = process.env.REACT_APP_TILE_SERVER_URL;
 
 const PATH_PRECISION = 5;
 
@@ -104,15 +102,8 @@ const Map = () => {
   const mapOptions = useMemo(
     () => ({
       width: "100%",
-      style: TILE_SERVER_URL + MAPBOX_STYLE,
+      style: mapboxStyle,
       bounds,
-      transformRequest: (url) => {
-        const [, relativePart] = url.split(document.location.origin);
-        if (!relativePart) return { url };
-        return {
-          url: document.location.origin + TILE_SERVER_URL + relativePart,
-        };
-      },
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
