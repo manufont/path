@@ -20,4 +20,14 @@ module.exports = function (app) {
       },
     })
   );
+
+  app.use(
+    "/osmt",
+    createProxyMiddleware({
+      target: "http://192.168.1.19:8010",
+      pathRewrite: {
+        "^/osmt/": "/", // remove base path
+      },
+    })
+  );
 };
