@@ -65,7 +65,7 @@ const PathDetails = ({ path, speed, setSpeed }) => {
   };
 
   return (
-    <Accordion>
+    <Accordion className={styles.root}>
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
         <div className={styles.summary}>
           <Typography variant="h6">

@@ -19,6 +19,13 @@
   flex: 1;
 }
 
-.summary > .shareButton {
+.shareButton {
   margin-left: auto;
+}
+
+/* on mobile */
+@media screen and (max-width: 640px) {
+  .root:global(.Mui-expanded) {
+    margin: initial;
+  }
 }

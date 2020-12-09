@@ -1,5 +1,6 @@
 import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider } from "@material-ui/core";
+import { StylesProvider } from "@material-ui/core/styles";
 
 import { Layout } from "components";
 
@@ -9,7 +10,9 @@ const App = () => {
   return (
     <BrowserRouter>
       <ThemeProvider theme={theme}>
-        <Layout></Layout>
+        <StylesProvider injectFirst>
+          <Layout />
+        </StylesProvider>
       </ThemeProvider>
     </BrowserRouter>
   );
