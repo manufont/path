@@ -2,6 +2,7 @@
   display: flex;
   flex: 1;
   align-items: center;
+  min-height: 48px;
 }
 
 .speedContainer {
@@ -19,13 +20,17 @@
   flex: 1;
 }
 
-.shareButton {
-  margin-left: auto;
-}
-
 /* on mobile */
 @media screen and (max-width: 640px) {
   .root:global(.Mui-expanded) {
     margin: initial;
   }
+}
+
+.progress {
+  flex: 1;
+}
+
+.pathDescription {
+  flex: 1;
 }

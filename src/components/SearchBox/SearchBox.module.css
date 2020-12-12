@@ -5,3 +5,11 @@
 .root > .cardContent {
   padding: 4px 16px 12px 16px;
 }
+
+.inputDivider {
+  height: 40px;
+}
+
+.input {
+  padding-right: 0 !important;
+}

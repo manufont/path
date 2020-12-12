@@ -43,6 +43,14 @@ export const pointsCmp = (pointsA, pointsB) => {
   return true;
 };
 
+export const boundsFromPoint = (point) => {
+  const delta = 0.01;
+  return [
+    [point[0] - delta, point[1] - delta],
+    [point[0] + delta, point[1] + delta],
+  ];
+};
+
 export const boundsCenter = (bounds) => [
   avg([bounds[0][0], bounds[1][0]]),
   avg([bounds[0][1], bounds[1][1]]),

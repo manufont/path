@@ -3,7 +3,13 @@ import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import TextField from "@material-ui/core/TextField";
+import Divider from "@material-ui/core/Divider";
+import IconButton from "@material-ui/core/IconButton";
+import InputAdornment from "@material-ui/core/InputAdornment";
+import ClearIcon from "@material-ui/icons/Clear";
+import GpsFixedIcon from "@material-ui/icons/GpsFixed";
 import queryString from "query-string";
+import cn from "classnames";
 
 import { bufferize } from "helpers/methods";
 import { photonToIcon, photonToString } from "helpers/photon";
@@ -15,8 +21,9 @@ const PHOTON_URL = process.env.REACT_APP_PHOTON_URL;
 
 const parsePhotonResults = (results) => results.features;
 
-const SearchBox = ({ mapCenter, onPlaceSelect, defaultSearchText }) => {
+const SearchBox = ({ mapCenter, onPlaceSelect, defaultSearchText, setLocation }) => {
   const [searchUrl, setSearchUrl] = useState(null);
+  const [hideGeolocation, setHideGeolocation] = useState(!navigator.geolocation);
   const [photons, loading, error] = useResource(searchUrl, parsePhotonResults);
   const [searchText, setSearchText] = useState(defaultSearchText);
 
@@ -40,6 +47,16 @@ const SearchBox = ({ mapCenter, onPlaceSelect, defaultSearchText }) => {
   useDidUpdateEffect(() => {
     setSearchText(defaultSearchText);
   }, [setSearchText, defaultSearchText]);
+
+  const geolocalize = () => {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setLocation([longitude, latitude]);
+      },
+      (error) => setHideGeolocation(true)
+    );
+  };
 
   return (
     <Card className={styles.root}>
@@ -67,8 +84,33 @@ const SearchBox = ({ mapCenter, onPlaceSelect, defaultSearchText }) => {
           renderInput={(params) => (
             <TextField
               {...params}
+              InputProps={{
+                ...params.InputProps,
+                className: cn(params.InputProps.className, styles.input),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    {searchText && (
+                      <>
+                        <IconButton onClick={() => setSearchText("")}>
+                          <ClearIcon />
+                        </IconButton>
+                        {!hideGeolocation && (
+                          <Divider orientation="vertical" className={styles.inputDivider} />
+                        )}
+                      </>
+                    )}
+                    {!hideGeolocation && (
+                      <IconButton onClick={geolocalize}>
+                        <GpsFixedIcon />
+                      </IconButton>
+                    )}
+                  </InputAdornment>
+                ),
+              }}
               error={error !== null}
-              label={error === null ? "Enter your starting point" : String(error)}
+              label={
+                error === null ? "Enter your starting point or click on the map" : String(error)
+              }
               margin="normal"
               variant="outlined"
             />
