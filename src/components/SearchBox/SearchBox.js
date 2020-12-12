@@ -48,7 +48,8 @@ const SearchBox = ({ mapCenter, onPlaceSelect, defaultSearchText, setLocation })
     setSearchText(defaultSearchText);
   }, [setSearchText, defaultSearchText]);
 
-  const geolocalize = () => {
+  const geolocalize = (e) => {
+    e.stopPropagation();
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
@@ -108,9 +109,7 @@ const SearchBox = ({ mapCenter, onPlaceSelect, defaultSearchText, setLocation })
                 ),
               }}
               error={error !== null}
-              label={
-                error === null ? "Enter your starting point or click on the map" : String(error)
-              }
+              label={error === null ? "Enter your starting point" : String(error)}
               margin="normal"
               variant="outlined"
             />
