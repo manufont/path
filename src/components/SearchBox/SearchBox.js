@@ -7,7 +7,7 @@ import queryString from "query-string";
 
 import { bufferize } from "helpers/methods";
 import { photonToIcon, photonToString } from "helpers/photon";
-import { useResource } from "hooks";
+import { useResource, useDidUpdateEffect } from "hooks";
 
 import styles from "./SearchBox.module.css";
 
@@ -24,14 +24,22 @@ const SearchBox = ({ mapCenter, onPlaceSelect, defaultSearchText }) => {
 
   useEffect(() => {
     if (searchText.trim().length > 1) {
+      const [lon, lat] = mapCenter;
       const searchParams = queryString.stringify({
         q: searchText,
+        lon,
+        lat,
       });
       bufferizedSetSearchUrl(`${PHOTON_URL}/api?${searchParams}`);
     } else {
       bufferizedSetSearchUrl(null);
     }
-  }, [searchText, bufferizedSetSearchUrl, mapCenter]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchText, bufferizedSetSearchUrl]);
+
+  useDidUpdateEffect(() => {
+    setSearchText(defaultSearchText);
+  }, [setSearchText, defaultSearchText]);
 
   return (
     <Card className={styles.root}>

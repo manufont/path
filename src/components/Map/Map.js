@@ -4,9 +4,9 @@ import polyline from "@mapbox/polyline";
 import { SearchBox, MapPath, PathDetails } from "components";
 import { Mapbox } from "contexts";
 import { useSearchState, usePath, useTitle } from "hooks";
-import { boundsEncoder, latLngEncoder, boundsCmp, franceBounds } from "helpers/geo";
+import { boundsEncoder, latLngEncoder, boundsCmp, franceBounds, boundsCenter } from "helpers/geo";
 import { first } from "helpers/methods";
-import { photonToString } from "helpers/photon";
+import { photonToString, getPhotonFromLocation } from "helpers/photon";
 
 import mapboxStyle from "./mapboxStyle";
 import styles from "./Map.module.css";
@@ -109,23 +109,34 @@ const Map = () => {
     []
   );
 
+  const onPlaceSelect = (place) => {
+    if (!place) return;
+    const newLocation = place.geometry.coordinates;
+    let newBounds = lngLatToBounds(newLocation);
+    if (place.properties.extent) {
+      newBounds = getBoundsFromPlace(place);
+    }
+    setLocationText(photonToString(place));
+    setLocation(newLocation, true);
+    setWaypoints([]);
+    setBounds(newBounds);
+  };
+
+  const setLocationFromMap = async (location) => {
+    setLocation(location);
+    const photon = await getPhotonFromLocation(location);
+    if (photon) {
+      setLocationText(photonToString(photon));
+    }
+  };
+
   return (
     <div className={styles.mapContainer}>
       <div className={styles.searchBox}>
         <SearchBox
           defaultSearchText={locationText}
-          onPlaceSelect={(place) => {
-            if (!place) return;
-            const newLocation = place.geometry.coordinates;
-            let newBounds = lngLatToBounds(newLocation);
-            if (place.properties.extent) {
-              newBounds = getBoundsFromPlace(place);
-            }
-            setLocationText(photonToString(place));
-            setLocation(newLocation, true);
-            setWaypoints([]);
-            setBounds(newBounds);
-          }}
+          mapCenter={boundsCenter(bounds)}
+          onPlaceSelect={onPlaceSelect}
         />
         <PathDetails path={path} speed={speed} setSpeed={setSpeed} />
       </div>
@@ -133,7 +144,7 @@ const Map = () => {
         <BoundsMapping bounds={bounds} setBounds={setBounds} />
         <MapPath
           location={location}
-          setLocation={setLocation}
+          setLocation={setLocationFromMap}
           waypoints={waypoints}
           setWaypoints={setWaypoints}
           path={path}

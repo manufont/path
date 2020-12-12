@@ -2,6 +2,9 @@ import HomeIcon from "@material-ui/icons/Home";
 import PublicIcon from "@material-ui/icons/Public";
 import LocationCityIcon from "@material-ui/icons/LocationCity";
 import RoadIcon from "mdi-material-ui/Road";
+import queryString from "query-string";
+
+const PHOTON_URL = process.env.REACT_APP_PHOTON_URL;
 
 export const photonToIcon = (photon) => {
   if (!photon) return null;
@@ -43,4 +46,15 @@ export const photonToString = (photon) => {
       console.log("Couldn't parse result", photon);
       return name || "";
   }
+};
+
+export const getPhotonFromLocation = async (location) => {
+  const [lon, lat] = location;
+  const searchParams = queryString.stringify({ lon, lat });
+  const response = await fetch(`${PHOTON_URL}/reverse?${searchParams}`);
+  const { features } = await response.json();
+  if (features.length > 0) {
+    return features[0];
+  }
+  return null;
 };

@@ -1,4 +1,4 @@
-import { minBy } from "./methods";
+import { minBy, avg } from "./methods";
 
 export const latLngCmp = (latLngA, latLngB) =>
   latLngA[0] === latLngB[0] && latLngA[1] === latLngB[1];
@@ -42,3 +42,8 @@ export const pointsCmp = (pointsA, pointsB) => {
   }
   return true;
 };
+
+export const boundsCenter = (bounds) => [
+  avg([bounds[0][0], bounds[1][0]]),
+  avg([bounds[0][1], bounds[1][1]]),
+];
