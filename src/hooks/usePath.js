@@ -40,7 +40,7 @@ const getPathUrl = (startPoint, waypoints, speed) => {
 
 const usePath = (startPoint, waypoints, speed) => {
   const url = getPathUrl(startPoint, waypoints, speed);
-  const [results, loading] = useResource(url);
+  const [results, loading, error] = useResource(url);
 
   const path = useMemo(() => {
     if (!results) return null;
@@ -52,7 +52,7 @@ const usePath = (startPoint, waypoints, speed) => {
     return path;
   }, [results, startPoint, speed]);
 
-  return [path, loading];
+  return [path, loading, error];
 };
 
 export default usePath;

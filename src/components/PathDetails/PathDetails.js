@@ -62,7 +62,7 @@ const PathDetails = ({ path, pathLoading, speed, setSpeed, setWaypoints }) => {
 
   const onClear = (e) => {
     e.stopPropagation();
-    setWaypoints([]);
+    setWaypoints([], true);
   };
 
   const closeSnackbar = (e) => {

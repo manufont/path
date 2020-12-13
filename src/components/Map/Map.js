@@ -1,4 +1,8 @@
-import React, { useEffect, useContext, useMemo } from "react";
+import React, { useEffect, useContext, useMemo, useState } from "react";
+import Alert from "@material-ui/lab/Alert";
+import Snackbar from "@material-ui/core/Snackbar";
+import IconButton from "@material-ui/core/IconButton";
+import UndoIcon from "@material-ui/icons/Undo";
 
 import { SearchBox, MapPath, PathDetails } from "components";
 import { Mapbox } from "contexts";
@@ -97,7 +101,12 @@ const Map = () => {
   const [waypoints, setWaypoints] = useSearchState("p", defaultPath, pathEncoder);
   const [locationText, setLocationText] = useSearchState("q", "");
   const [speed, setSpeed] = useSearchState("s", 10, numberEncoder);
-  const [path, pathLoading] = usePath(location, waypoints, speed);
+  const [path, pathLoading, pathError] = usePath(location, waypoints, speed);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+
+  useEffect(() => {
+    setSnackbarOpen(Boolean(pathError));
+  }, [pathError]);
 
   useTitle(getTitle(path, locationText));
 
@@ -157,6 +166,26 @@ const Map = () => {
             setWaypoints={setWaypoints}
           />
         )}
+        <Snackbar open={snackbarOpen}>
+          <Alert
+            variant="filled"
+            action={
+              <IconButton
+                color="inherit"
+                size="small"
+                onClick={() => {
+                  setSnackbarOpen(false);
+                  window.history.back();
+                }}
+              >
+                <UndoIcon />
+              </IconButton>
+            }
+            severity="error"
+          >
+            Cannot build path
+          </Alert>
+        </Snackbar>
       </div>
       <Mapbox.Provider options={mapOptions} style={{ flex: 1 }}>
         <BoundsMapping bounds={bounds} setBounds={setBounds} />
