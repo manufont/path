@@ -1,6 +1,7 @@
 import { useContext, useEffect } from "react";
 
 import { Mapbox } from "contexts";
+import { last } from "helpers/methods";
 
 const MapWaypoints = ({ waypoints, setWaypoints }) => {
   const map = useContext(Mapbox);
@@ -143,7 +144,7 @@ const MapPolyline = ({ path }) => {
     if (!path) return;
     const sourceData = {
       type: "FeatureCollection",
-      features: path.trip.legs.map((leg) => ({
+      features: path.trip.legs.slice(0, -1).map((leg) => ({
         type: "Feature",
         geometry: {
           type: "LineString",
@@ -200,11 +201,79 @@ const MapPolyline = ({ path }) => {
   }, [map, path]);
 
   useEffect(() => {
+    if (!path) return;
+    const sourceData = {
+      type: "Feature",
+      geometry: {
+        type: "LineString",
+        coordinates: last(path.trip.legs).decodedShape,
+      },
+    };
+
+    const source = map.getSource("return-polyline");
+    if (!source) {
+      map.addSource("return-polyline", {
+        type: "geojson",
+        data: sourceData,
+      });
+    } else {
+      source.setData(sourceData);
+    }
+    if (!map.getLayer("return-polyline-background-layer")) {
+      map.addLayer(
+        {
+          id: "return-polyline-background-layer",
+          source: "return-polyline",
+          type: "line",
+          layout: {
+            "line-join": "round",
+            "line-cap": "round",
+          },
+          paint: {
+            "line-color": "rgba(0,0,0,0.5)",
+            "line-dasharray": [
+              "step",
+              ["zoom"],
+              ["literal", [0, 2 * (5 / 8)]],
+              16,
+              ["literal", [0, 5 * (5 / 8)]],
+            ],
+            "line-width": 8,
+          },
+        },
+        "waypoints-layer"
+      );
+    }
+    if (!map.getLayer("return-polyline-layer")) {
+      map.addLayer(
+        {
+          id: "return-polyline-layer",
+          source: "return-polyline",
+          type: "line",
+          layout: {
+            "line-join": "round",
+            "line-cap": "round",
+          },
+          paint: {
+            "line-color": "#00bcd4",
+            "line-dasharray": ["step", ["zoom"], ["literal", [0, 2]], 16, ["literal", [0, 5]]],
+            "line-width": 5,
+          },
+        },
+        "polyline-layer"
+      );
+    }
+  }, [map, path]);
+
+  useEffect(() => {
     return () => {
       if (!map) return;
       map.safeRemoveLayer("polyline-background-layer");
       map.safeRemoveLayer("polyline-layer");
+      map.safeRemoveLayer("return-polyline-background-layer");
+      map.safeRemoveLayer("return-polyline-layer");
       map.safeRemoveSource("polyline");
+      map.safeRemoveSource("return-polyline");
     };
   }, [map]);
 

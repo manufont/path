@@ -1,4 +1,11 @@
-import { minBy, avg } from "./methods";
+import polyline from "@mapbox/polyline";
+
+import { minBy, avg, first } from "./methods";
+
+const PATH_PRECISION = parseInt(process.env.REACT_APP_PATH_PRECISION);
+const PRECISION_10 = Math.pow(10, PATH_PRECISION);
+
+export const toPrecision = (n) => Math.round(n * PRECISION_10) / PRECISION_10;
 
 export const latLngCmp = (latLngA, latLngB) =>
   latLngA[0] === latLngB[0] && latLngA[1] === latLngB[1];
@@ -9,11 +16,11 @@ export const boundsCmp = (boundsA, boundsB) =>
 export const latLngEncoder = {
   encode: (latLng) => {
     if (latLng === null) return undefined;
-    return latLng.map((_) => Math.round(_ * 1e5)).join(".");
+    return latLng.map((_) => Math.round(_ * PRECISION_10)).join(".");
   },
   decode: (str) => {
     if (str === "") return null;
-    return str.split(".").map((_) => parseInt(_) / 1e5);
+    return str.split(".").map((_) => parseInt(_) / PRECISION_10);
   },
 };
 
@@ -24,7 +31,7 @@ export const boundsEncoder = {
 
 export const franceBounds = [
   [-5.5591, 41.31433],
-  [9.662499, 51.1241999],
+  [9.6625, 51.1242],
 ];
 
 export const distance = (pointA, pointB) => {
@@ -55,3 +62,17 @@ export const boundsCenter = (bounds) => [
   avg([bounds[0][0], bounds[1][0]]),
   avg([bounds[0][1], bounds[1][1]]),
 ];
+
+const pEncode = (points) => polyline.encode(points, PATH_PRECISION);
+const pDecode = (str) => polyline.decode(str, PATH_PRECISION);
+
+const uriBtoa = (str) => btoa(str).replace(/=/g, "~").replace(/\//g, ".");
+const uriAtob = (str) => atob(str.replace(/~/g, " ").replace(/\./g, "/"));
+
+export const pathEncoder = {
+  encode: (path) => uriBtoa(pEncode(path)),
+  decode: (str) => pDecode(uriAtob(str)),
+};
+
+export const getWaypointsFromPath = (path) =>
+  pDecode(pEncode(path.trip.legs.map((leg) => first(leg.decodedShape)).slice(1)));

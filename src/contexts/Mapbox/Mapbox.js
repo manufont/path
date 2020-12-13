@@ -96,7 +96,7 @@ const enhanceMap = (map) => {
   };
 
   map.safeRemoveSource = (sourceId) => {
-    if (map && map.getSource(sourceId)) {
+    if (map && map.loaded() && map.getSource(sourceId)) {
       map.removeSource(sourceId);
     }
   };
@@ -127,9 +127,6 @@ export const MapboxProvider = ({ children, token, options, ...containerProps }) 
     mapboxMap.on("load", onMapLoad);
     return () => {
       mapboxMap.off("load", onMapLoad);
-      //map is cleared before unmount
-      //setTimeout is needed to wait for child cleanup first
-      setTimeout(() => mapboxMap.remove());
     };
   }, [container, token, options]);
 

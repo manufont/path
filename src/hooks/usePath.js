@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 import polyline from "@mapbox/polyline";
 
-import { first } from "helpers/methods";
 import useResource, { addCacheEntry } from "./useResource";
+import { getWaypointsFromPath } from "helpers/geo";
 
 const VALHALLA_URL = process.env.REACT_APP_VALHALLA_URL;
 
@@ -37,9 +37,6 @@ const getPathUrl = (startPoint, waypoints, speed) => {
   };
   return `${VALHALLA_URL}/route?json=${JSON.stringify(params)}`;
 };
-
-const getWaypointsFromPath = (path) =>
-  path.trip.legs.map((leg) => first(leg.decodedShape)).slice(1);
 
 const usePath = (startPoint, waypoints, speed) => {
   const url = getPathUrl(startPoint, waypoints, speed);

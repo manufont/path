@@ -1,5 +1,4 @@
 import React, { useEffect, useContext, useMemo } from "react";
-import polyline from "@mapbox/polyline";
 
 import { SearchBox, MapPath, PathDetails } from "components";
 import { Mapbox } from "contexts";
@@ -11,22 +10,14 @@ import {
   franceBounds,
   boundsCenter,
   boundsFromPoint,
+  getWaypointsFromPath,
+  pathEncoder,
+  toPrecision,
 } from "helpers/geo";
-import { first } from "helpers/methods";
 import { photonToString, getPhotonFromLocation } from "helpers/photon";
 
 import mapboxStyle from "./mapboxStyle";
 import styles from "./Map.module.css";
-
-const PATH_PRECISION = 6;
-
-const uriBtoa = (str) => btoa(str).replace(/=/g, "~").replace(/\//g, ".");
-const uriAtob = (str) => atob(str.replace(/~/g, " ").replace(/\./g, "/"));
-
-const pathEncoder = {
-  encode: (path) => uriBtoa(polyline.encode(path, PATH_PRECISION)),
-  decode: (str) => polyline.decode(uriAtob(str), PATH_PRECISION),
-};
 
 const numberEncoder = {
   encode: (nb) => String(nb),
@@ -67,16 +58,26 @@ const getTitle = (path, locationText) => {
 const BoundsMapping = ({ bounds, setBounds }) => {
   const map = useContext(Mapbox);
 
-  // map -> url binding
+  // url -> map binding
   useEffect(() => {
-    const mapBounds = map.getBounds().toArray();
+    const mapBounds = map
+      .getBounds()
+      .toArray()
+      .map((_) => _.map(toPrecision));
     if (!boundsCmp(mapBounds, bounds)) {
       map.fitBounds(bounds, {
         maxDuration: 2500, // 2.5 seconds
       });
     }
+  }, [map, bounds]);
+
+  // map -> url binding
+  useEffect(() => {
     const onMoveEnd = () => {
-      const mapBounds = map.getBounds().toArray();
+      const mapBounds = map
+        .getBounds()
+        .toArray()
+        .map((_) => _.map(toPrecision));
       if (!boundsCmp(mapBounds, bounds)) {
         setBounds(mapBounds);
       }
@@ -102,8 +103,7 @@ const Map = () => {
 
   useEffect(() => {
     if (!path) return;
-    const correctedWaypoints = path.trip.legs.map((leg) => first(leg.decodedShape)).slice(1);
-    setWaypoints(correctedWaypoints);
+    setWaypoints(getWaypointsFromPath(path));
   }, [path, setWaypoints]);
 
   const mapOptions = useMemo(
