@@ -40,6 +40,36 @@ export const distance = (pointA, pointB) => {
   return Math.sqrt(Math.pow(lonA - lonB, 2) + Math.pow(latA - latB, 2));
 };
 
+const closestOfSegment = (p, v, w) => {
+  const l2 = distance(v, w);
+  if (l2 === 0) return v;
+  const t = ((p[1] - v[1]) * (w[1] - v[1]) + (p[0] - v[0]) * (w[0] - v[0])) / l2;
+  if (t < 0) return v;
+  if (t > 1) return w;
+  return [v[0] + t * (w[0] - v[0]), v[1] + t * (w[1] - v[1])];
+};
+
+export const snapToPolyline = (polyline, point) => {
+  var minDistance = Number.MAX_VALUE;
+  var indexOfClosest = 0;
+  for (var i = 0; i < polyline.length; ++i) {
+    let d = distance(polyline[i], point);
+    if (d < minDistance) {
+      minDistance = d;
+      indexOfClosest = i;
+    }
+  }
+  const closest = polyline[indexOfClosest];
+
+  return minBy(
+    [indexOfClosest - 1, indexOfClosest + 1]
+      .map((index) => polyline[index])
+      .filter((_) => _ !== undefined)
+      .map((_) => closestOfSegment(point, closest, _)),
+    (_) => distance(point, _)
+  );
+};
+
 export const closestPoint = (polyline, point) => minBy(polyline, (_) => distance(_, point));
 
 export const pointsCmp = (pointsA, pointsB) => {
