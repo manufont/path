@@ -69,8 +69,8 @@ const MapWaypoints = ({ waypoints, setWaypoints }) => {
   useEffect(() => {
     return () => {
       if (!map) return;
-      map.safeRemoveLayer("waypoints-layer");
-      map.safeRemoveSource("waypoints");
+      map.removeLayer("waypoints-layer");
+      map.removeSource("waypoints");
     };
   }, [map]);
 
@@ -129,8 +129,8 @@ const MapLocation = ({ location, setLocation }) => {
   useEffect(() => {
     return () => {
       if (!map) return;
-      map.safeRemoveLayer("location-layer");
-      map.safeRemoveSource("location");
+      map.removeLayer("location-layer");
+      map.removeSource("location");
     };
   }, [map]);
 
@@ -268,12 +268,12 @@ const MapPolyline = ({ path }) => {
   useEffect(() => {
     return () => {
       if (!map) return;
-      map.safeRemoveLayer("polyline-background-layer");
-      map.safeRemoveLayer("polyline-layer");
-      map.safeRemoveLayer("return-polyline-background-layer");
-      map.safeRemoveLayer("return-polyline-layer");
-      map.safeRemoveSource("polyline");
-      map.safeRemoveSource("return-polyline");
+      map.removeLayer("polyline-background-layer");
+      map.removeLayer("polyline-layer");
+      map.removeLayer("return-polyline-background-layer");
+      map.removeLayer("return-polyline-layer");
+      map.removeSource("polyline");
+      map.removeSource("return-polyline");
     };
   }, [map]);
 

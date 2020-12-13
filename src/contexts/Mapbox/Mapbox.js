@@ -89,17 +89,6 @@ const enhanceMap = (map) => {
     };
   };
 
-  map.safeRemoveLayer = (layerId) => {
-    if (map && map.getLayer(layerId)) {
-      map.removeLayer(layerId);
-    }
-  };
-
-  map.safeRemoveSource = (sourceId) => {
-    if (map && map.loaded() && map.getSource(sourceId)) {
-      map.removeSource(sourceId);
-    }
-  };
   return map;
 };
 
