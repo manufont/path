@@ -40,7 +40,7 @@ const useResource = (url, parseResult = noop, fetcher = defaultFetcher) => {
       });
   }, [url, parseResult, fetcher]);
 
-  const loading = url !== null && !fetched;
+  const loading = url !== null && !fetched && !error;
 
   return [resource, loading, resource ? null : error];
 };

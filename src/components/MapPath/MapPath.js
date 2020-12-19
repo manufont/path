@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useCallback } from "react";
 import nearestPointOnLine from "@turf/nearest-point-on-line";
 
 import { Mapbox } from "contexts";
@@ -25,9 +25,9 @@ const MapHoveredWaypoint = ({ feature, onDragEnd }) => {
         type: "circle",
         paint: {
           "circle-color": "white",
-          "circle-radius": 6,
+          "circle-radius": 10,
           "circle-stroke-color": "rgba(0,0,0,0.5)",
-          "circle-stroke-width": 8,
+          "circle-stroke-width": 2,
         },
       });
     }
@@ -37,7 +37,6 @@ const MapHoveredWaypoint = ({ feature, onDragEnd }) => {
       feature.geometry.coordinates = [lng, lat];
       source.setData(feature);
     };
-
     return map.makeLayerDraggable("hovered-waypoint-layer", onDragMove, onDragEnd);
   }, [map, feature, onDragEnd]);
 
@@ -52,7 +51,7 @@ const MapHoveredWaypoint = ({ feature, onDragEnd }) => {
   return null;
 };
 
-const MapWaypoints = ({ waypoints, setWaypoints }) => {
+const MapWaypoints = ({ waypoints, setWaypoints, setHoveredFeature }) => {
   const map = useContext(Mapbox);
 
   useEffect(() => {
@@ -214,6 +213,64 @@ const MapPolyline = ({ path, setHoveredFeature }) => {
     } else {
       source.setData(sourceData);
     }
+    if (!map.getLayer("polyline-box-layer")) {
+      map.addLayer(
+        {
+          id: "polyline-box-layer",
+          source: "polyline",
+          type: "line",
+          layout: {
+            "line-join": "round",
+            "line-cap": "round",
+          },
+          paint: {
+            "line-color": "rgba(0,0,0,0)",
+            "line-width": 40,
+          },
+        },
+        "waypoints-layer"
+      );
+
+      const onMouseMove = (e) => {
+        e.originalEvent.stopPropagation();
+        const features = map.queryRenderedFeatures(e.point);
+        const feature = features.find((_) => _.layer.id === "polyline-box-layer");
+        const onWaypoints = features.find((_) =>
+          ["waypoints-layer", "location-layer"].includes(_.layer.id)
+        );
+        if (onWaypoints) {
+          setHoveredFeature(null);
+          return;
+        }
+        const lngLat = e.lngLat.toArray();
+        const closestLatLng = nearestPointOnLine(feature, lngLat);
+        setHoveredFeature({
+          ...closestLatLng,
+          properties: {
+            ts: Date.now(),
+            legId: feature.properties.id,
+          },
+        });
+        return false;
+      };
+      map.on("mousemove", "polyline-box-layer", onMouseMove);
+      map.on("touchend", "polyline-box-layer", onMouseMove);
+      let onDrag = false;
+      map.on("mousedown", "polyline-box-layer", (e) => {
+        e.originalEvent.stopPropagation();
+        onDrag = true;
+        map.once("mouseup", () => {
+          onDrag = false;
+        });
+      });
+      map.on("mouseleave", "polyline-box-layer", (e) => {
+        if (!onDrag) {
+          setHoveredFeature(null);
+
+          map.getCanvas().style.cursor = "";
+        }
+      });
+    }
     if (!map.getLayer("polyline-background-layer")) {
       map.addLayer(
         {
@@ -249,31 +306,6 @@ const MapPolyline = ({ path, setHoveredFeature }) => {
         },
         "location-layer"
       );
-      map.on("mousemove", "polyline-background-layer", (e) => {
-        const [feature] = map.queryRenderedFeatures(e.point, {
-          layers: ["polyline-background-layer"],
-        });
-        const lngLat = e.lngLat.toArray();
-        const closestLatLng = nearestPointOnLine(feature, lngLat);
-        setHoveredFeature({
-          ...closestLatLng,
-          properties: {
-            legId: feature.properties.id,
-          },
-        });
-      });
-      let onDrag = false;
-      map.on("mousedown", "polyline-background-layer", () => {
-        onDrag = true;
-        map.once("mouseup", () => {
-          onDrag = false;
-        });
-      });
-      map.on("mouseleave", "polyline-background-layer", (e) => {
-        if (!onDrag) {
-          setHoveredFeature(null);
-        }
-      });
     }
   }, [map, path, setHoveredFeature]);
 
@@ -346,6 +378,7 @@ const MapPolyline = ({ path, setHoveredFeature }) => {
     return () => {
       if (!map) return;
       map.removeLayer("polyline-background-layer");
+      map.removeLayer("polyline-box-layer");
       map.removeLayer("polyline-layer");
       map.removeLayer("return-polyline-background-layer");
       map.removeLayer("return-polyline-layer");
@@ -367,6 +400,7 @@ const MapPath = ({ location, setLocation, waypoints, setWaypoints, path }) => {
       switch (feature && feature.source) {
         case "waypoints":
         case "location":
+        case "polyline":
           e.originalEvent.stopPropagation();
           return;
         default:
@@ -385,26 +419,32 @@ const MapPath = ({ location, setLocation, waypoints, setWaypoints, path }) => {
     };
   }, [map, waypoints, setWaypoints, location, setLocation]);
 
+  const onHoveredWaypointDragEnd = useCallback(
+    (e) => {
+      const { lat, lng } = e.lngLat;
+      const { legId } = hoveredFeature.properties;
+      const newWaypoints = waypoints.slice();
+      newWaypoints.splice(legId, 0, [lng, lat]);
+      setWaypoints(newWaypoints, true);
+      setHoveredFeature(null);
+    },
+    [hoveredFeature, setWaypoints, waypoints]
+  );
+
   if (!location) return null;
   return (
     <>
-      <MapWaypoints waypoints={waypoints} setWaypoints={setWaypoints} />
+      <MapWaypoints
+        waypoints={waypoints}
+        setWaypoints={setWaypoints}
+        setHoveredFeature={setHoveredFeature}
+      />
       <MapLocation location={location} setLocation={setLocation} />
       {waypoints.length > 0 && (
         <>
           <MapPolyline path={path} setHoveredFeature={setHoveredFeature} />
           {hoveredFeature && (
-            <MapHoveredWaypoint
-              feature={hoveredFeature}
-              onDragEnd={(e) => {
-                const { lat, lng } = e.lngLat;
-                const { legId } = hoveredFeature.properties;
-                const newWaypoints = waypoints.slice();
-                newWaypoints.splice(legId, 0, [lng, lat]);
-                setWaypoints(newWaypoints, true);
-                setHoveredFeature(null);
-              }}
-            />
+            <MapHoveredWaypoint feature={hoveredFeature} onDragEnd={onHoveredWaypointDragEnd} />
           )}
         </>
       )}
