@@ -72,7 +72,10 @@ const PathDetails = ({ path, pathLoading, speed, setSpeed, setWaypoints }) => {
 
   return (
     <Accordion className={styles.root}>
-      <AccordionSummary expandIcon={<SettingsIcon />}>
+      <AccordionSummary
+        expandIcon={<SettingsIcon />}
+        classes={{ content: styles.accordionContent, expanded: styles.accordionExpanded }}
+      >
         <div className={styles.summary}>
           {path ? (
             <>

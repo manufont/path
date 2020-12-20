@@ -1,6 +1,4 @@
 import React, { useEffect, useState, useMemo } from "react";
-import Card from "@material-ui/core/Card";
-import CardContent from "@material-ui/core/CardContent";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import TextField from "@material-ui/core/TextField";
 import Divider from "@material-ui/core/Divider";
@@ -60,63 +58,59 @@ const SearchBox = ({ mapCenter, onPlaceSelect, defaultSearchText, setLocation })
   };
 
   return (
-    <Card className={styles.root}>
-      <CardContent className={styles.cardContent}>
-        <Autocomplete
-          freeSolo
-          options={photons || []}
-          getOptionLabel={photonToString}
-          renderOption={(option) => {
-            const Icon = photonToIcon(option);
-            return (
-              <span>
-                <Icon className={styles.icon} /> {photonToString(option)}
-              </span>
-            );
-          }}
-          onInput={(e) => setSearchText(e.target.value)}
-          onChange={(e, value) => {
-            setSearchText(photonToString(value));
-            onPlaceSelect(value);
-          }}
-          value={{ properties: { type: "label", name: searchText } }}
-          noOptionsText="No result found."
-          loading={loading}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              InputProps={{
-                ...params.InputProps,
-                className: cn(params.InputProps.className, styles.input),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    {searchText && (
-                      <>
-                        <IconButton onClick={() => setSearchText("")}>
-                          <ClearIcon />
-                        </IconButton>
-                        {!hideGeolocation && (
-                          <Divider orientation="vertical" className={styles.inputDivider} />
-                        )}
-                      </>
-                    )}
+    <Autocomplete
+      freeSolo
+      options={photons || []}
+      getOptionLabel={photonToString}
+      renderOption={(option) => {
+        const Icon = photonToIcon(option);
+        return (
+          <span>
+            <Icon className={styles.icon} /> {photonToString(option)}
+          </span>
+        );
+      }}
+      onInput={(e) => setSearchText(e.target.value)}
+      onChange={(e, value) => {
+        setSearchText(photonToString(value));
+        onPlaceSelect(value);
+      }}
+      value={{ properties: { type: "label", name: searchText } }}
+      noOptionsText="No result found."
+      loading={loading}
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          InputProps={{
+            ...params.InputProps,
+            className: cn(params.InputProps.className, styles.input),
+            endAdornment: (
+              <InputAdornment position="end">
+                {searchText && (
+                  <>
+                    <IconButton onClick={() => setSearchText("")}>
+                      <ClearIcon />
+                    </IconButton>
                     {!hideGeolocation && (
-                      <IconButton onClick={geolocalize}>
-                        <GpsFixedIcon />
-                      </IconButton>
+                      <Divider orientation="vertical" className={styles.inputDivider} />
                     )}
-                  </InputAdornment>
-                ),
-              }}
-              error={error !== null}
-              label={error === null ? "Enter your starting point" : String(error)}
-              margin="normal"
-              variant="outlined"
-            />
-          )}
+                  </>
+                )}
+                {!hideGeolocation && (
+                  <IconButton onClick={geolocalize}>
+                    <GpsFixedIcon />
+                  </IconButton>
+                )}
+              </InputAdornment>
+            ),
+          }}
+          error={error !== null}
+          label={error === null ? "Enter your starting point" : String(error)}
+          margin="normal"
+          variant="outlined"
         />
-      </CardContent>
-    </Card>
+      )}
+    />
   );
 };
 

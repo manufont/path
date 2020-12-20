@@ -1,6 +1,8 @@
 import React, { useEffect, useContext, useMemo, useState } from "react";
 import Alert from "@material-ui/lab/Alert";
 import Snackbar from "@material-ui/core/Snackbar";
+import Card from "@material-ui/core/Card";
+import CardContent from "@material-ui/core/CardContent";
 import IconButton from "@material-ui/core/IconButton";
 import UndoIcon from "@material-ui/icons/Undo";
 
@@ -151,21 +153,26 @@ const Map = () => {
   return (
     <div className={styles.mapContainer}>
       <div className={styles.searchBox}>
-        <SearchBox
-          defaultSearchText={locationText}
-          mapCenter={boundsCenter(bounds)}
-          onPlaceSelect={onPlaceSelect}
-          setLocation={setLocationFromPoint}
-        />
-        {location && (
-          <PathDetails
-            path={path}
-            pathLoading={pathLoading}
-            speed={speed}
-            setSpeed={setSpeed}
-            setWaypoints={setWaypoints}
-          />
-        )}
+        <Card>
+          <CardContent className={styles.cardContent}>
+            <SearchBox
+              defaultSearchText={locationText}
+              mapCenter={boundsCenter(bounds)}
+              onPlaceSelect={onPlaceSelect}
+              setLocation={setLocationFromPoint}
+            />
+          </CardContent>
+          {location && (
+            <PathDetails
+              path={path}
+              pathLoading={pathLoading}
+              speed={speed}
+              setSpeed={setSpeed}
+              setWaypoints={setWaypoints}
+            />
+          )}
+        </Card>
+
         <Snackbar open={snackbarOpen}>
           <Alert
             variant="filled"

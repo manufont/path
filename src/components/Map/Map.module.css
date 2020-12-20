@@ -5,6 +5,10 @@
   position: relative;
 }
 
+.cardContent {
+  padding: 4px 16px 4px 16px;
+}
+
 .searchBox {
   position: absolute;
   top: 16px;
