@@ -20,10 +20,11 @@ const parsePathResults = (results) => {
   };
 };
 
-const getPathUrl = (startPoint, waypoints, speed) => {
+const getPathUrl = (startPoint, waypoints, options) => {
   if (waypoints.length === 0) return null;
+  const { speed, mode } = options;
   const params = {
-    costing: "pedestrian",
+    costing: mode === "running" ? "pedestrian" : "bicycle",
     locations: [startPoint, ...waypoints, startPoint].map((point) => ({
       lon: point[0],
       lat: point[1],
@@ -33,13 +34,16 @@ const getPathUrl = (startPoint, waypoints, speed) => {
       pedestrian: {
         walking_speed: speed,
       },
+      bicycle: {
+        cycling_speed: speed,
+      },
     },
   };
   return `${VALHALLA_URL}/route?json=${JSON.stringify(params)}`;
 };
 
-const usePath = (startPoint, waypoints, speed) => {
-  const url = getPathUrl(startPoint, waypoints, speed);
+const usePath = (startPoint, waypoints, options) => {
+  const url = getPathUrl(startPoint, waypoints, options);
   const [results, loading, error] = useResource(url);
 
   const path = useMemo(() => {
@@ -47,10 +51,10 @@ const usePath = (startPoint, waypoints, speed) => {
     const path = parsePathResults(results);
     if (path) {
       const correctedWaypoints = getWaypointsFromPath(path);
-      addCacheEntry(getPathUrl(startPoint, correctedWaypoints, speed), results);
+      addCacheEntry(getPathUrl(startPoint, correctedWaypoints, options), results);
     }
     return path;
-  }, [results, startPoint, speed]);
+  }, [results, startPoint, options]);
 
   return [path, loading, error];
 };

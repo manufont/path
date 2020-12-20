@@ -24,11 +24,9 @@
   flex: 1;
 }
 
-/* on mobile */
-@media screen and (max-width: 640px) {
-  .root .accordionExpanded {
-    margin: initial;
-  }
+.root .accordionExpanded {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 .progress {

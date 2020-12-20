@@ -5,6 +5,10 @@ import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import IconButton from "@material-ui/core/IconButton";
 import UndoIcon from "@material-ui/icons/Undo";
+import DirectionsRunIcon from "@material-ui/icons/DirectionsRun";
+import DirectionsBikeIcon from "@material-ui/icons/DirectionsBike";
+import Tabs from "@material-ui/core/Tabs";
+import Tab from "@material-ui/core/Tab";
 
 import { SearchBox, MapPath, PathDetails } from "components";
 import { Mapbox } from "contexts";
@@ -102,8 +106,12 @@ const Map = () => {
   const [location, setLocation] = useSearchState("l", null, latLngEncoder);
   const [waypoints, setWaypoints] = useSearchState("p", defaultPath, pathEncoder);
   const [locationText, setLocationText] = useSearchState("q", "");
-  const [speed, setSpeed] = useSearchState("s", 10, numberEncoder);
-  const [path, pathLoading, pathError] = usePath(location, waypoints, speed);
+  const [mode, setMode] = useSearchState("m", "running");
+  const [speed, setSpeed] = useSearchState("s", mode === "running" ? 10 : 25, numberEncoder);
+  const pathOptions = useMemo(() => ({
+    mode, speed
+  }), [mode, speed])
+  const [path, pathLoading, pathError] = usePath(location, waypoints, pathOptions);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
 
   useEffect(() => {
@@ -162,8 +170,13 @@ const Map = () => {
               setLocation={setLocationFromPoint}
             />
           </CardContent>
+          <Tabs value={mode} onChange={(e, _) => setMode(_)} centered textColor="primary">
+            <Tab wrapped icon={<DirectionsRunIcon />} value="running" />
+            <Tab wrapped icon={<DirectionsBikeIcon />} value="cycling" />
+          </Tabs>
           {location && (
             <PathDetails
+              mode={mode}
               path={path}
               pathLoading={pathLoading}
               speed={speed}

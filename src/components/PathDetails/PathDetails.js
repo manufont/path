@@ -14,6 +14,7 @@ import Slider from "@material-ui/core/Slider";
 import Input from "@material-ui/core/Input";
 import MuiAlert from "@material-ui/lab/Alert";
 import RunFastIcon from "mdi-material-ui/RunFast";
+import BikeFastIcon from "mdi-material-ui/BikeFast";
 
 import { formatDuration } from "helpers/date";
 import { useBufferedState } from "hooks";
@@ -46,7 +47,7 @@ const PathDescription = ({ path }) => {
   );
 };
 
-const PathDetails = ({ path, pathLoading, speed, setSpeed, setWaypoints }) => {
+const PathDetails = ({ path, pathLoading, speed, setSpeed, setWaypoints, mode }) => {
   const [instantSpeed, setInstantSpeed] = useBufferedState(speed, setSpeed, 200);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
 
@@ -103,13 +104,13 @@ const PathDetails = ({ path, pathLoading, speed, setSpeed, setWaypoints }) => {
       </AccordionSummary>
       <AccordionDetails>
         <div className={styles.speedContainer}>
-          <RunFastIcon />
+          {mode === "running" ? <RunFastIcon /> : <BikeFastIcon />}
           <Slider
             value={instantSpeed}
             className={styles.slider}
             onChange={(e, value) => setInstantSpeed(value)}
-            min={4}
-            max={25}
+            min={mode === "running" ? 4 : 12}
+            max={mode === "running" ? 25 : 45}
             step={1}
             aria-labelledby="input-slider"
           />
