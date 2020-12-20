@@ -1,13 +1,18 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 
 import { bufferize } from "helpers/methods";
+import useDidUpdateEffect from "./useDidUpdateEffect";
 
 export default function useBufferedState(value, setter, delay) {
   const [instantValue, setInstantValue] = useState(value);
 
   const bufferedFunc = useMemo(() => bufferize(setter, delay), [setter, delay]);
 
-  useEffect(() => {
+  useDidUpdateEffect(() => {
+    setInstantValue(value);
+  }, [setter]);
+
+  useDidUpdateEffect(() => {
     bufferedFunc(instantValue);
   }, [instantValue, bufferedFunc]);
 
