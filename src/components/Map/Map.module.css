@@ -6,7 +6,11 @@
 }
 
 .cardContent {
-  padding: 4px 16px 4px 16px;
+  padding: 4px 16px 0px 16px;
+}
+
+.cardContent:last-child {
+  padding-bottom: 12px;
 }
 
 .searchBox {

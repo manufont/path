@@ -108,9 +108,13 @@ const Map = () => {
   const [locationText, setLocationText] = useSearchState("q", "");
   const [mode, setMode] = useSearchState("m", "running");
   const [speed, setSpeed] = useSearchState("s", mode === "running" ? 10 : 25, numberEncoder);
-  const pathOptions = useMemo(() => ({
-    mode, speed
-  }), [mode, speed])
+  const pathOptions = useMemo(
+    () => ({
+      mode,
+      speed,
+    }),
+    [mode, speed]
+  );
   const [path, pathLoading, pathError] = usePath(location, waypoints, pathOptions);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
 
@@ -170,19 +174,21 @@ const Map = () => {
               setLocation={setLocationFromPoint}
             />
           </CardContent>
-          <Tabs value={mode} onChange={(e, _) => setMode(_)} centered textColor="primary">
-            <Tab wrapped icon={<DirectionsRunIcon />} value="running" />
-            <Tab wrapped icon={<DirectionsBikeIcon />} value="cycling" />
-          </Tabs>
           {location && (
-            <PathDetails
-              mode={mode}
-              path={path}
-              pathLoading={pathLoading}
-              speed={speed}
-              setSpeed={setSpeed}
-              setWaypoints={setWaypoints}
-            />
+            <>
+              <Tabs value={mode} onChange={(e, _) => setMode(_)} centered textColor="primary">
+                <Tab wrapped icon={<DirectionsRunIcon />} value="running" />
+                <Tab wrapped icon={<DirectionsBikeIcon />} value="cycling" />
+              </Tabs>
+              <PathDetails
+                mode={mode}
+                path={path}
+                pathLoading={pathLoading}
+                speed={speed}
+                setSpeed={setSpeed}
+                setWaypoints={setWaypoints}
+              />
+            </>
           )}
         </Card>
 
