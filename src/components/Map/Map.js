@@ -12,7 +12,7 @@ import Tab from "@material-ui/core/Tab";
 
 import { SearchBox, MapPath, PathDetails } from "components";
 import { Mapbox } from "contexts";
-import { useSearchState, usePath, useTitle } from "hooks";
+import { useSearchState, usePath, useTitle, useDidUpdateEffect } from "hooks";
 import {
   boundsEncoder,
   latLngEncoder,
@@ -28,6 +28,11 @@ import { photonToString, getPhotonFromLocation } from "helpers/photon";
 
 import mapboxStyle from "./mapboxStyle";
 import styles from "./Map.module.css";
+
+const DEFAULT_USE_ROADS = 0.5;
+const DEFAULT_AVOID_BAD_SURFACES = 0.25;
+const DEFAULT_RUNNING_SPEED = 10;
+const DEFAULT_CYCLING_SPEED = 25;
 
 const numberEncoder = {
   encode: (nb) => String(nb),
@@ -107,18 +112,34 @@ const Map = () => {
   const [waypoints, setWaypoints] = useSearchState("p", defaultPath, pathEncoder);
   const [locationText, setLocationText] = useSearchState("q", "");
   const [mode, setMode] = useSearchState("m", "running");
-  const [speed, setSpeed] = useSearchState("s", mode === "running" ? 10 : 25, numberEncoder);
+  const defaultSpeed = mode === "running" ? DEFAULT_RUNNING_SPEED : DEFAULT_CYCLING_SPEED;
+  const [speed, setSpeed] = useSearchState("s", defaultSpeed, numberEncoder);
+  const [useRoads, setUseRoads] = useSearchState("ur", DEFAULT_USE_ROADS, numberEncoder);
+  const [avoidBadSurfaces, setAvoidBadSurfaces] = useSearchState(
+    "abs",
+    DEFAULT_AVOID_BAD_SURFACES,
+    numberEncoder
+  );
   const pathOptions = useMemo(
     () => ({
       mode,
       speed,
+      useRoads,
+      avoidBadSurfaces,
     }),
-    [mode, speed]
+    [mode, speed, useRoads, avoidBadSurfaces]
   );
   const [path, pathLoading, pathError] = usePath(location, waypoints, pathOptions);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
 
-  useEffect(() => {
+  useDidUpdateEffect(() => {
+    if (mode === "running") {
+      setUseRoads(DEFAULT_USE_ROADS);
+      setAvoidBadSurfaces(DEFAULT_AVOID_BAD_SURFACES);
+    }
+  }, [mode, setUseRoads, setAvoidBadSurfaces]);
+
+  useDidUpdateEffect(() => {
     setSnackbarOpen(Boolean(pathError));
   }, [pathError]);
 
@@ -176,7 +197,7 @@ const Map = () => {
           </CardContent>
           {location && (
             <>
-              <Tabs value={mode} onChange={(e, _) => setMode(_)} centered textColor="primary">
+              <Tabs value={mode} onChange={(e, _) => setMode(_, true)} centered textColor="primary">
                 <Tab wrapped icon={<DirectionsRunIcon />} value="running" />
                 <Tab wrapped icon={<DirectionsBikeIcon />} value="cycling" />
               </Tabs>
@@ -186,6 +207,10 @@ const Map = () => {
                 pathLoading={pathLoading}
                 speed={speed}
                 setSpeed={setSpeed}
+                useRoads={useRoads}
+                setUseRoads={setUseRoads}
+                avoidBadSurfaces={avoidBadSurfaces}
+                setAvoidBadSurfaces={setAvoidBadSurfaces}
                 setWaypoints={setWaypoints}
               />
             </>

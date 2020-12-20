@@ -13,8 +13,6 @@ import ClearIcon from "@material-ui/icons/Clear";
 import Slider from "@material-ui/core/Slider";
 import Input from "@material-ui/core/Input";
 import MuiAlert from "@material-ui/lab/Alert";
-import RunFastIcon from "mdi-material-ui/RunFast";
-import BikeFastIcon from "mdi-material-ui/BikeFast";
 
 import { formatDuration } from "helpers/date";
 import { useBufferedState } from "hooks";
@@ -47,8 +45,25 @@ const PathDescription = ({ path }) => {
   );
 };
 
-const PathDetails = ({ path, pathLoading, speed, setSpeed, setWaypoints, mode }) => {
+const PathDetails = ({
+  path,
+  pathLoading,
+  speed,
+  setSpeed,
+  useRoads,
+  setUseRoads,
+  avoidBadSurfaces,
+  setAvoidBadSurfaces,
+  setWaypoints,
+  mode,
+}) => {
   const [instantSpeed, setInstantSpeed] = useBufferedState(speed, setSpeed, 200);
+  const [instantUseRoads, setInstantUseRoads] = useBufferedState(useRoads, setUseRoads, 200);
+  const [instantAvoidBadSurfaces, setInstantAvoidBadSurfaces] = useBufferedState(
+    avoidBadSurfaces,
+    setAvoidBadSurfaces,
+    200
+  );
   const [snackbarOpen, setSnackbarOpen] = useState(false);
 
   const onShareClick = (e) => {
@@ -102,32 +117,74 @@ const PathDetails = ({ path, pathLoading, speed, setSpeed, setWaypoints, mode })
           )}
         </div>
       </AccordionSummary>
-      <AccordionDetails>
-        <div className={styles.speedContainer}>
-          {mode === "running" ? <RunFastIcon /> : <BikeFastIcon />}
-          <Slider
-            value={instantSpeed}
-            className={styles.slider}
-            onChange={(e, value) => setInstantSpeed(value)}
-            min={mode === "running" ? 4 : 12}
-            max={mode === "running" ? 25 : 45}
-            step={1}
-            aria-labelledby="input-slider"
-          />
-          <Input
-            value={instantSpeed}
-            margin="dense"
-            onChange={(e) => setInstantSpeed(e.target.value)}
-            endAdornment={<InputAdornment position="end">Km/h</InputAdornment>}
-            inputProps={{
-              step: 1,
-              min: 4,
-              max: 25,
-              type: "number",
-              "aria-labelledby": "input-slider",
-            }}
-          />
+      <AccordionDetails className={styles.accordionDetails}>
+        <div>
+          <Typography id="continuous-slider" gutterBottom>
+            Speed
+          </Typography>
+          <div className={styles.speedContainer}>
+            <Slider
+              value={instantSpeed}
+              className={styles.speedSlider}
+              onChange={(e, value) => setInstantSpeed(value)}
+              min={mode === "running" ? 4 : 12}
+              max={mode === "running" ? 25 : 45}
+              step={1}
+              aria-labelledby="input-slider"
+            />
+            <Input
+              value={instantSpeed}
+              margin="dense"
+              onChange={(e) => setInstantSpeed(e.target.value)}
+              endAdornment={<InputAdornment position="end">Km/h</InputAdornment>}
+              inputProps={{
+                step: 1,
+                min: mode === "running" ? 4 : 12,
+                max: mode === "running" ? 25 : 45,
+                type: "number",
+                "aria-labelledby": "input-slider",
+              }}
+            />
+          </div>
         </div>
+        {mode === "cycling" && (
+          <>
+            <div>
+              <Typography gutterBottom>Use roads</Typography>
+              <div className={styles.sliderContainer}>
+                <Slider
+                  value={instantUseRoads}
+                  onChange={(e, value) => setInstantUseRoads(value)}
+                  marks={[
+                    { value: 0, label: "No" },
+                    { value: 0.5, label: "Maybe" },
+                    { value: 1, label: "Yes" },
+                  ]}
+                  min={0}
+                  max={1}
+                  step={0.1}
+                ></Slider>
+              </div>
+            </div>
+            <div>
+              <Typography gutterBottom>Avoid bad surfaces</Typography>
+              <div className={styles.sliderContainer}>
+                <Slider
+                  value={instantAvoidBadSurfaces}
+                  onChange={(e, value) => setInstantAvoidBadSurfaces(value)}
+                  marks={[
+                    { value: 0, label: "No" },
+                    { value: 0.5, label: "Maybe" },
+                    { value: 1, label: "Yes" },
+                  ]}
+                  min={0}
+                  max={1}
+                  step={0.125}
+                ></Slider>
+              </div>
+            </div>
+          </>
+        )}
       </AccordionDetails>
     </Accordion>
   );

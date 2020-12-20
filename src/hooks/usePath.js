@@ -22,7 +22,7 @@ const parsePathResults = (results) => {
 
 const getPathUrl = (startPoint, waypoints, options) => {
   if (waypoints.length === 0) return null;
-  const { speed, mode } = options;
+  const { speed, mode, useRoads, avoidBadSurfaces } = options;
   const params = {
     costing: mode === "running" ? "pedestrian" : "bicycle",
     locations: [startPoint, ...waypoints, startPoint].map((point) => ({
@@ -31,13 +31,19 @@ const getPathUrl = (startPoint, waypoints, options) => {
       options: { allowUTurn: true },
     })),
     costing_options: {
-      pedestrian: {
-        walking_speed: speed,
-      },
-      bicycle: {
-        cycling_speed: speed,
-        bicycle_type: "Road",
-      },
+      ...(mode === "running" && {
+        pedestrian: {
+          walking_speed: speed,
+        },
+      }),
+      ...(mode === "cycling" && {
+        bicycle: {
+          cycling_speed: speed,
+          bicycle_type: "Road",
+          use_roads: useRoads,
+          avoid_bad_surfaces: avoidBadSurfaces,
+        },
+      }),
     },
   };
   return `${VALHALLA_URL}/route?json=${JSON.stringify(params)}`;

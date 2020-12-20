@@ -12,7 +12,6 @@
 .speedContainer {
   display: flex;
   flex: 1;
-  margin: 0 -8px;
   align-items: center;
 }
 
@@ -20,13 +19,21 @@
   margin: 0 8px;
 }
 
-.slider {
+.speedSlider {
   flex: 1;
+}
+
+.sliderContainer {
+  margin: 0 8px;
 }
 
 .root .accordionExpanded {
   margin-top: 0;
   margin-bottom: 0;
+}
+
+.accordionDetails {
+  flex-direction: column;
 }
 
 .progress {

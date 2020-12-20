@@ -10,7 +10,7 @@ export default function useBufferedState(value, setter, delay) {
 
   useDidUpdateEffect(() => {
     setInstantValue(value);
-  }, [setter]);
+  }, [setter, value]);
 
   useDidUpdateEffect(() => {
     bufferedFunc(instantValue);
