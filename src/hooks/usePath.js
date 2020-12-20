@@ -36,6 +36,7 @@ const getPathUrl = (startPoint, waypoints, options) => {
       },
       bicycle: {
         cycling_speed: speed,
+        bicycle_type: "Road",
       },
     },
   };
