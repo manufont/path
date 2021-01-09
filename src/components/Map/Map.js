@@ -155,7 +155,6 @@ const Map = () => {
       width: "100%",
       style: mapboxStyle,
       bounds,
-      pitchWithRotate: false,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
