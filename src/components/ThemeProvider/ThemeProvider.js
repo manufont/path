@@ -26,9 +26,9 @@ export const ThemeProvider = ({ children }) => {
 
   useEffect(() => {
     const onPrefersDarkChange = (e) => {
-      console.log("change ! ", e);
       setTheme(e.matches ? darkTheme : lightTheme);
     };
+
     prefersDark.addEventListener("change", onPrefersDarkChange);
     return () => prefersDark.removeEventListener("change", onPrefersDarkChange);
   }, [setTheme]);

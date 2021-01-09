@@ -9,6 +9,7 @@ import DirectionsRunIcon from "@material-ui/icons/DirectionsRun";
 import DirectionsBikeIcon from "@material-ui/icons/DirectionsBike";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
+import { useTheme } from "@material-ui/core/styles";
 
 import { SearchBox, MapPath, PathDetails } from "components";
 import { Mapbox } from "contexts";
@@ -26,7 +27,8 @@ import {
 } from "helpers/geo";
 import { photonToString, getPhotonFromLocation } from "helpers/photon";
 
-import mapboxStyle from "./mapboxStyle";
+import mapboxLightStyle from "./mapboxStyle";
+import mapboxDarkStyle from "./mapboxDarkStyle";
 import styles from "./Map.module.css";
 
 const DEFAULT_USE_ROADS = 0.5;
@@ -131,6 +133,7 @@ const Map = () => {
   );
   const [path, pathLoading, pathError] = usePath(location, waypoints, pathOptions);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const theme = useTheme();
 
   useDidUpdateEffect(() => {
     if (mode === "running") {
@@ -153,11 +156,11 @@ const Map = () => {
   const mapOptions = useMemo(
     () => ({
       width: "100%",
-      style: mapboxStyle,
+      style: theme.palette.type === "dark" ? mapboxDarkStyle : mapboxLightStyle,
       bounds,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [theme]
   );
 
   const onPlaceSelect = (place) => {

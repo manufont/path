@@ -1,5 +1,25 @@
 const TILE_SERVER_URL = process.env.REACT_APP_TILE_SERVER_URL;
 
+// dark theme obtained with the following code:
+// const handleHsl = (elt, index) => {
+//   if (index === 0) return elt;
+//   const [h, s, l, ...rest] = elt.split(",");
+//   const [value, ...valueRest] = l.split("%");
+//   const newValue = 100 - parseInt(value);
+//   const newL = [newValue, ...valueRest].join("%");
+//   return [h, s, newL, ...rest].join(",");
+// };
+// const getDarkStyle = (lightStyle) =>
+//   JSON.parse(
+//     JSON.stringify(lightStyle)
+//       .split("hsl(")
+//       .map(handleHsl)
+//       .join("hsl(")
+//       .split("hsla(")
+//       .map(handleHsl)
+//       .join("hsla(")
+//   );
+
 const sources = {
   openmaptiles: {
     type: "vector",
@@ -513,7 +533,7 @@ const sources = {
 };
 
 const layers = [
-  { id: "background", paint: { "background-color": "hsl(47, 26%, 88%)" }, type: "background" },
+  { id: "background", paint: { "background-color": "hsl(47, 26%,12%)" }, type: "background" },
   {
     filter: [
       "all",
@@ -521,7 +541,7 @@ const layers = [
       ["in", "class", "residential", "suburb", "neighbourhood"],
     ],
     id: "landuse-residential",
-    paint: { "fill-color": "hsl(47, 13%, 86%)", "fill-opacity": 0.7 },
+    paint: { "fill-color": "hsl(47, 13%,14%)", "fill-opacity": 0.7 },
     source: "openmaptiles",
     "source-layer": "landuse",
     type: "fill",
@@ -529,7 +549,7 @@ const layers = [
   {
     filter: ["==", "class", "grass"],
     id: "landcover_grass",
-    paint: { "fill-color": "hsl(82, 46%, 72%)", "fill-opacity": 0.45 },
+    paint: { "fill-color": "hsl(82, 46%,28%)", "fill-opacity": 0.45 },
     source: "openmaptiles",
     "source-layer": "landcover",
     type: "fill",
@@ -538,7 +558,7 @@ const layers = [
     filter: ["==", "class", "wood"],
     id: "landcover_wood",
     paint: {
-      "fill-color": "hsl(82, 46%, 72%)",
+      "fill-color": "hsl(82, 46%,28%)",
       "fill-opacity": {
         base: 1,
         stops: [
@@ -554,7 +574,7 @@ const layers = [
   {
     filter: ["all", ["==", "$type", "Polygon"], ["!=", "intermittent", 1]],
     id: "water",
-    paint: { "fill-color": "hsl(205, 56%, 73%)" },
+    paint: { "fill-color": "hsl(205, 56%,27%)" },
     source: "openmaptiles",
     "source-layer": "water",
     type: "fill",
@@ -562,7 +582,7 @@ const layers = [
   {
     filter: ["all", ["==", "$type", "Polygon"], ["==", "intermittent", 1]],
     id: "water_intermittent",
-    paint: { "fill-color": "hsl(205, 56%, 73%)", "fill-opacity": 0.7 },
+    paint: { "fill-color": "hsl(205, 56%,27%)", "fill-opacity": 0.7 },
     source: "openmaptiles",
     "source-layer": "water",
     type: "fill",
@@ -570,7 +590,7 @@ const layers = [
   {
     filter: ["==", "subclass", "ice_shelf"],
     id: "landcover-ice-shelf",
-    paint: { "fill-color": "hsl(47, 26%, 88%)", "fill-opacity": 0.8 },
+    paint: { "fill-color": "hsl(47, 26%,12%)", "fill-opacity": 0.8 },
     source: "openmaptiles",
     "source-layer": "landcover",
     type: "fill",
@@ -579,7 +599,7 @@ const layers = [
     filter: ["==", "subclass", "glacier"],
     id: "landcover-glacier",
     paint: {
-      "fill-color": "hsl(47, 22%, 94%)",
+      "fill-color": "hsl(47, 22%,6%)",
       "fill-opacity": {
         base: 1,
         stops: [
@@ -596,11 +616,7 @@ const layers = [
     filter: ["all", ["in", "class", "sand"]],
     id: "landcover_sand",
     metadata: {},
-    paint: {
-      "fill-antialias": false,
-      "fill-color": "hsl(54, 81%, 53%)",
-      "fill-opacity": 0.3,
-    },
+    paint: { "fill-antialias": false, "fill-color": "hsl(54, 81%,47%)", "fill-opacity": 0.3 },
     source: "openmaptiles",
     "source-layer": "landcover",
     type: "fill",
@@ -608,7 +624,7 @@ const layers = [
   {
     filter: ["==", "class", "agriculture"],
     id: "landuse",
-    paint: { "fill-color": "hsl(37, 38%, 87%)" },
+    paint: { "fill-color": "hsl(37, 38%,13%)" },
     source: "openmaptiles",
     "source-layer": "landuse",
     type: "fill",
@@ -617,7 +633,7 @@ const layers = [
     filter: ["==", "class", "national_park"],
     id: "landuse_overlay_national_park",
     paint: {
-      "fill-color": "hsl(70, 60%, 81%)",
+      "fill-color": "hsl(70, 60%,19%)",
       "fill-opacity": {
         base: 1,
         stops: [
@@ -634,7 +650,7 @@ const layers = [
     filter: ["all", ["==", "$type", "LineString"], ["==", "brunnel", "tunnel"]],
     id: "waterway-tunnel",
     paint: {
-      "line-color": "hsl(205, 56%, 73%)",
+      "line-color": "hsl(205, 56%,27%)",
       "line-dasharray": [3, 3],
       "line-gap-width": {
         stops: [
@@ -664,7 +680,7 @@ const layers = [
     ],
     id: "waterway",
     paint: {
-      "line-color": "hsl(205, 56%, 73%)",
+      "line-color": "hsl(205, 56%,27%)",
       "line-opacity": 1,
       "line-width": {
         base: 1.4,
@@ -687,7 +703,7 @@ const layers = [
     ],
     id: "waterway_intermittent",
     paint: {
-      "line-color": "hsl(205, 56%, 73%)",
+      "line-color": "hsl(205, 56%,27%)",
       "line-opacity": 1,
       "line-width": {
         base: 1.4,
@@ -713,7 +729,7 @@ const layers = [
     layout: { "line-cap": "butt", "line-join": "miter" },
     minzoom: 0,
     paint: {
-      "line-color": "hsl(34, 12%, 66%)",
+      "line-color": "hsl(34, 12%,34%)",
       "line-dasharray": [3, 3],
       "line-opacity": {
         base: 1,
@@ -731,7 +747,7 @@ const layers = [
     id: "building",
     paint: {
       "fill-antialias": true,
-      "fill-color": "hsl(39, 33%, 81%)",
+      "fill-color": "hsl(39, 33%,19%)",
       "fill-opacity": {
         base: 1,
         stops: [
@@ -741,8 +757,8 @@ const layers = [
       },
       "fill-outline-color": {
         stops: [
-          [15, "hsla(28, 43%, 70%, 0)"],
-          [16, "hsla(28, 43%, 70%, 0.5)"],
+          [15, "hsla(28, 43%,30%, 0)"],
+          [16, "hsla(28, 43%,30%, 0.5)"],
         ],
       },
     },
@@ -753,13 +769,9 @@ const layers = [
   {
     filter: ["==", "$type", "Point"],
     id: "housenumber",
-    layout: {
-      "text-field": "{housenumber}",
-      "text-font": ["Noto Sans Regular"],
-      "text-size": 10,
-    },
+    layout: { "text-field": "{housenumber}", "text-font": ["Noto Sans Regular"], "text-size": 10 },
     minzoom: 17,
-    paint: { "text-color": "hsl(28, 43%, 70%)" },
+    paint: { "text-color": "hsl(28, 43%,30%)" },
     source: "openmaptiles",
     "source-layer": "housenumber",
     type: "symbol",
@@ -771,7 +783,7 @@ const layers = [
     source: "openmaptiles",
     "source-layer": "transportation",
     filter: ["all", ["==", "$type", "Polygon"], ["==", "class", "pier"]],
-    paint: { "fill-color": "hsl(47, 26%, 88%)", "fill-antialias": true },
+    paint: { "fill-color": "hsl(47, 26%,12%)", "fill-antialias": true },
   },
   {
     id: "road_pier",
@@ -782,7 +794,7 @@ const layers = [
     filter: ["all", ["==", "$type", "LineString"], ["in", "class", "pier"]],
     layout: { "line-cap": "round", "line-join": "round" },
     paint: {
-      "line-color": "hsl(47, 26%, 88%)",
+      "line-color": "hsl(47, 26%,12%)",
       "line-width": {
         base: 1.2,
         stops: [
@@ -796,7 +808,7 @@ const layers = [
     filter: ["all", ["==", "$type", "Polygon"], ["in", "brunnel", "bridge"]],
     id: "road_bridge_area",
     layout: {},
-    paint: { "fill-color": "hsl(47, 26%, 88%)", "fill-opacity": 0.5 },
+    paint: { "fill-color": "hsl(47, 26%,12%)", "fill-opacity": 0.5 },
     source: "openmaptiles",
     "source-layer": "transportation",
     type: "fill",
@@ -806,7 +818,7 @@ const layers = [
     id: "road_path",
     layout: { "line-cap": "square", "line-join": "bevel" },
     paint: {
-      "line-color": "hsl(0, 0%, 97%)",
+      "line-color": "hsl(0, 0%,3%)",
       "line-dasharray": [1, 1],
       "line-width": {
         base: 1.55,
@@ -825,7 +837,7 @@ const layers = [
     id: "road_minor",
     layout: { "line-cap": "round", "line-join": "round" },
     paint: {
-      "line-color": "hsl(0, 0%, 97%)",
+      "line-color": "hsl(0, 0%,3%)",
       "line-width": {
         base: 1.55,
         stops: [
@@ -849,7 +861,7 @@ const layers = [
     id: "tunnel_minor",
     layout: { "line-cap": "butt", "line-join": "miter" },
     paint: {
-      "line-color": "hsl(0, 0%, 94%)",
+      "line-color": "hsl(0, 0%,6%)",
       "line-dasharray": [0.36, 0.18],
       "line-width": {
         base: 1.55,
@@ -873,7 +885,7 @@ const layers = [
     id: "tunnel_major",
     layout: { "line-cap": "butt", "line-join": "miter" },
     paint: {
-      "line-color": "hsl(0, 0%, 100%)",
+      "line-color": "hsl(0, 0%,0%)",
       "line-dasharray": [0.28, 0.14],
       "line-width": {
         base: 1.4,
@@ -893,7 +905,7 @@ const layers = [
     metadata: { "mapbox:group": "1444849345966.4436" },
     minzoom: 4,
     paint: {
-      "fill-color": "hsl(0, 0%, 100%)",
+      "fill-color": "hsl(0, 0%,0%)",
       "fill-opacity": {
         base: 1,
         stops: [
@@ -913,7 +925,7 @@ const layers = [
     metadata: { "mapbox:group": "1444849345966.4436" },
     minzoom: 12,
     paint: {
-      "line-color": "hsl(0, 0%, 100%)",
+      "line-color": "hsl(0, 0%,0%)",
       "line-opacity": 1,
       "line-width": {
         base: 1.5,
@@ -934,7 +946,7 @@ const layers = [
     metadata: { "mapbox:group": "1444849345966.4436" },
     minzoom: 4,
     paint: {
-      "line-color": "hsl(0, 0%, 100%)",
+      "line-color": "hsl(0, 0%,0%)",
       "line-opacity": 1,
       "line-width": {
         base: 1.5,
@@ -953,7 +965,7 @@ const layers = [
     id: "road_trunk_primary",
     layout: { "line-cap": "round", "line-join": "round" },
     paint: {
-      "line-color": "hsl(0, 0%, 100%)",
+      "line-color": "hsl(0, 0%,0%)",
       "line-width": {
         base: 1.4,
         stops: [
@@ -971,7 +983,7 @@ const layers = [
     id: "road_secondary_tertiary",
     layout: { "line-cap": "round", "line-join": "round" },
     paint: {
-      "line-color": "hsl(0, 0%, 100%)",
+      "line-color": "hsl(0, 0%,0%)",
       "line-width": {
         base: 1.4,
         stops: [
@@ -989,7 +1001,7 @@ const layers = [
     id: "road_major_motorway",
     layout: { "line-cap": "round", "line-join": "round" },
     paint: {
-      "line-color": "hsl(0, 0%, 100%)",
+      "line-color": "hsl(0, 0%,0%)",
       "line-offset": 0,
       "line-width": {
         base: 1.4,
@@ -1007,7 +1019,7 @@ const layers = [
     filter: ["all", ["==", "class", "transit"], ["!=", "brunnel", "tunnel"]],
     id: "railway-transit",
     paint: {
-      "line-color": "hsl(34, 12%, 66%)",
+      "line-color": "hsl(34, 12%,34%)",
       "line-opacity": {
         base: 1,
         stops: [
@@ -1024,7 +1036,7 @@ const layers = [
     filter: ["==", "class", "rail"],
     id: "railway",
     paint: {
-      "line-color": "hsl(34, 12%, 66%)",
+      "line-color": "hsl(34, 12%,34%)",
       "line-opacity": {
         base: 1,
         stops: [
@@ -1042,7 +1054,7 @@ const layers = [
     id: "waterway-bridge-case",
     layout: { "line-cap": "butt", "line-join": "miter" },
     paint: {
-      "line-color": "hsl(0, 0%, 73%)",
+      "line-color": "hsl(0, 0%,27%)",
       "line-gap-width": {
         base: 1.55,
         stops: [
@@ -1067,7 +1079,7 @@ const layers = [
     id: "waterway-bridge",
     layout: { "line-cap": "round", "line-join": "round" },
     paint: {
-      "line-color": "hsl(205, 56%, 73%)",
+      "line-color": "hsl(205, 56%,27%)",
       "line-width": {
         base: 1.55,
         stops: [
@@ -1090,7 +1102,7 @@ const layers = [
     id: "bridge_minor case",
     layout: { "line-cap": "butt", "line-join": "miter" },
     paint: {
-      "line-color": "hsl(0, 0%, 87%)",
+      "line-color": "hsl(0, 0%,13%)",
       "line-gap-width": {
         base: 1.55,
         stops: [
@@ -1120,7 +1132,7 @@ const layers = [
     id: "bridge_major case",
     layout: { "line-cap": "butt", "line-join": "miter" },
     paint: {
-      "line-color": "hsl(0, 0%, 87%)",
+      "line-color": "hsl(0, 0%,13%)",
       "line-gap-width": {
         base: 1.55,
         stops: [
@@ -1150,7 +1162,7 @@ const layers = [
     id: "bridge_minor",
     layout: { "line-cap": "round", "line-join": "round" },
     paint: {
-      "line-color": "hsl(0, 0%, 94%)",
+      "line-color": "hsl(0, 0%,6%)",
       "line-width": {
         base: 1.55,
         stops: [
@@ -1173,7 +1185,7 @@ const layers = [
     id: "bridge_major",
     layout: { "line-cap": "round", "line-join": "round" },
     paint: {
-      "line-color": "hsl(0, 0%, 100%)",
+      "line-color": "hsl(0, 0%,0%)",
       "line-width": {
         base: 1.4,
         stops: [
@@ -1189,7 +1201,7 @@ const layers = [
   {
     filter: ["in", "admin_level", 4, 6, 8],
     id: "admin_sub",
-    paint: { "line-color": "hsla(0, 0%, 60%, 0.5)", "line-dasharray": [2, 1] },
+    paint: { "line-color": "hsla(0, 0%,40%, 0.5)", "line-dasharray": [2, 1] },
     source: "openmaptiles",
     "source-layer": "boundary",
     type: "line",
@@ -1199,7 +1211,7 @@ const layers = [
     id: "admin_country",
     layout: { "line-cap": "round", "line-join": "round" },
     paint: {
-      "line-color": "hsl(0, 0%, 60%)",
+      "line-color": "hsl(0, 0%,40%)",
       "line-width": {
         base: 1.3,
         stops: [
@@ -1226,9 +1238,9 @@ const layers = [
     },
     minzoom: 14,
     paint: {
-      "text-color": "hsl(0, 0%, 40%)",
+      "text-color": "hsl(0, 0%,60%)",
       "text-halo-blur": 1,
-      "text-halo-color": "hsla(0, 0%, 100%, 0.75)",
+      "text-halo-color": "hsla(0, 0%,0%, 0.75)",
       "text-halo-width": 1,
     },
     source: "openmaptiles",
@@ -1249,9 +1261,9 @@ const layers = [
     },
     minzoom: 10,
     paint: {
-      "text-color": "hsl(0, 0%, 40%)",
+      "text-color": "hsl(0, 0%,60%)",
       "text-halo-blur": 1,
-      "text-halo-color": "hsla(0, 0%, 100%, 0.75)",
+      "text-halo-color": "hsla(0, 0%,0%, 0.75)",
       "text-halo-width": 1,
     },
     source: "openmaptiles",
@@ -1277,8 +1289,8 @@ const layers = [
       "text-transform": "uppercase",
     },
     paint: {
-      "text-color": "hsl(0, 0%, 0%)",
-      "text-halo-color": "hsl(0, 0%, 100%)",
+      "text-color": "hsl(0, 0%,100%)",
+      "text-halo-color": "hsl(0, 0%,0%)",
       "text-halo-width": 2,
     },
     source: "openmaptiles",
@@ -1306,9 +1318,9 @@ const layers = [
     },
     minzoom: 8,
     paint: {
-      "text-color": "hsl(0, 0%, 25%)",
+      "text-color": "hsl(0, 0%,75%)",
       "text-halo-blur": 0,
-      "text-halo-color": "hsl(0, 0%, 100%)",
+      "text-halo-color": "hsl(0, 0%,0%)",
       "text-halo-width": 2,
     },
     source: "openmaptiles",
@@ -1331,9 +1343,9 @@ const layers = [
     },
     maxzoom: 16,
     paint: {
-      "text-color": "hsl(0, 0%, 0%)",
+      "text-color": "hsl(0, 0%,100%)",
       "text-halo-blur": 0,
-      "text-halo-color": "hsla(0, 0%, 100%, 0.75)",
+      "text-halo-color": "hsla(0, 0%,0%, 0.75)",
       "text-halo-width": 2,
     },
     source: "openmaptiles",
@@ -1356,9 +1368,9 @@ const layers = [
     },
     maxzoom: 12,
     paint: {
-      "text-color": "hsl(0, 0%, 13%)",
+      "text-color": "hsl(0, 0%,87%)",
       "text-halo-blur": 0,
-      "text-halo-color": "hsla(0, 0%, 100%, 0.75)",
+      "text-halo-color": "hsla(0, 0%,0%, 0.75)",
       "text-halo-width": 2,
     },
     source: "openmaptiles",
@@ -1381,9 +1393,9 @@ const layers = [
     },
     maxzoom: 12,
     paint: {
-      "text-color": "hsl(0, 0%, 13%)",
+      "text-color": "hsl(0, 0%,87%)",
       "text-halo-blur": 0,
-      "text-halo-color": "hsla(0, 0%, 100%, 0.75)",
+      "text-halo-color": "hsla(0, 0%,0%, 0.75)",
       "text-halo-width": 2,
     },
     source: "openmaptiles",
