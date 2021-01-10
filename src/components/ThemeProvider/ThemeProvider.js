@@ -3,6 +3,7 @@ import { ThemeProvider as MuiThemeProvider } from "@material-ui/core";
 import { createMuiTheme } from "@material-ui/core/styles";
 import green from "@material-ui/core/colors/green";
 import blueGrey from "@material-ui/core/colors/blueGrey";
+import CssBaseline from "@material-ui/core/CssBaseline";
 
 const lightTheme = createMuiTheme({
   palette: {
@@ -33,7 +34,12 @@ export const ThemeProvider = ({ children }) => {
     return () => prefersDark.removeEventListener("change", onPrefersDarkChange);
   }, [setTheme]);
 
-  return <MuiThemeProvider theme={theme}>{children}</MuiThemeProvider>;
+  return (
+    <MuiThemeProvider theme={theme}>
+      <CssBaseline />
+      {children}
+    </MuiThemeProvider>
+  );
 };
 
 export default ThemeProvider;
