@@ -83,7 +83,7 @@ const darkenHsl = (elt, index) => {
   return [h, s, newL, ...rest].join(",");
 };
 
-console.time("dark");
+// This only works if every style color is defined with hsl or hsla
 const getDarkStyle = (lightStyle) =>
   JSON.parse(
     JSON.stringify(lightStyle)
@@ -94,7 +94,6 @@ const getDarkStyle = (lightStyle) =>
       .map(darkenHsl)
       .join("hsla(")
   );
-console.timeEnd("dark");
 
 const mapboxDarkStyle = getDarkStyle(mapboxLightStyle);
 
