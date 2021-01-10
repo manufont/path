@@ -23,7 +23,7 @@ const darkTheme = createMuiTheme({
 const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
 
 export const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState(prefersDark.matches || true ? darkTheme : lightTheme);
+  const [theme, setTheme] = useState(prefersDark.matches ? darkTheme : lightTheme);
 
   useEffect(() => {
     const onPrefersDarkChange = (e) => {
