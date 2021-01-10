@@ -28,7 +28,6 @@ import {
 import { photonToString, getPhotonFromLocation } from "helpers/photon";
 
 import mapboxLightStyle from "./mapboxStyle";
-import mapboxDarkStyle from "./mapboxDarkStyle";
 import styles from "./Map.module.css";
 
 const DEFAULT_USE_ROADS = 0.5;
@@ -71,6 +70,33 @@ const getTitle = (path, locationText) => {
   const distanceText = path.trip.summary.length.toFixed(1) + " km";
   return `${distanceText} near ${locationText} - ManuPath`;
 };
+
+// we use a pow < 1 in order to prevent contrast to crunch between dark colors
+const darkenLuminosity = (l) => Math.round(100 * Math.pow(1 - l / 100, 0.9));
+
+const darkenHsl = (elt, index) => {
+  if (index === 0) return elt;
+  const [h, s, l, ...rest] = elt.split(",");
+  const [value, ...valueRest] = l.split("%");
+  const newValue = darkenLuminosity(parseInt(value));
+  const newL = [newValue, ...valueRest].join("%");
+  return [h, s, newL, ...rest].join(",");
+};
+
+console.time("dark");
+const getDarkStyle = (lightStyle) =>
+  JSON.parse(
+    JSON.stringify(lightStyle)
+      .split("hsl(")
+      .map(darkenHsl)
+      .join("hsl(")
+      .split("hsla(")
+      .map(darkenHsl)
+      .join("hsla(")
+  );
+console.timeEnd("dark");
+
+const mapboxDarkStyle = getDarkStyle(mapboxLightStyle);
 
 const BoundsMapping = ({ bounds, setBounds }) => {
   const map = useContext(Mapbox);
