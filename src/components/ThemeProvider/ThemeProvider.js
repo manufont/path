@@ -29,9 +29,30 @@ export const ThemeProvider = ({ children }) => {
     const onPrefersDarkChange = (e) => {
       setTheme(e.matches ? darkTheme : lightTheme);
     };
-
-    prefersDark.addEventListener("change", onPrefersDarkChange);
-    return () => prefersDark.removeEventListener("change", onPrefersDarkChange);
+    try {
+      // Chrome & Firefox
+      prefersDark.addEventListener("change", onPrefersDarkChange);
+    } catch (e1) {
+      try {
+        // Safari
+        prefersDark.addListener(onPrefersDarkChange);
+      } catch (e2) {
+        console.error(e2);
+      }
+    }
+    return () => {
+      try {
+        // Chrome & Firefox
+        prefersDark.removeEventListener("change", onPrefersDarkChange);
+      } catch (e1) {
+        try {
+          // Safari
+          prefersDark.removeListener(onPrefersDarkChange);
+        } catch (e2) {
+          console.error(e2);
+        }
+      }
+    };
   }, [setTheme]);
 
   return (
