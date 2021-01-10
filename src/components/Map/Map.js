@@ -10,6 +10,7 @@ import DirectionsBikeIcon from "@material-ui/icons/DirectionsBike";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import { useTheme } from "@material-ui/core/styles";
+import Color from "color";
 
 import { SearchBox, MapPath, PathDetails } from "components";
 import { Mapbox } from "contexts";
@@ -72,10 +73,11 @@ const getTitle = (path, locationText) => {
 };
 
 // we use a pow < 1 in order to prevent contrast to crunch between dark colors
-const darkenLuminosity = (l) => Math.round(100 * Math.pow(1 - l / 100, 0.9));
+const darkenLuminosity = (l) => {
+  return Math.round(100 * Math.pow(1 - l / 100, 0.9));
+};
 
 const darkenHsl = (elt, index) => {
-  if (index === 0) return elt;
   const [h, s, l, ...rest] = elt.split(",");
   const [value, ...valueRest] = l.split("%");
   const newValue = darkenLuminosity(parseInt(value));
@@ -83,19 +85,28 @@ const darkenHsl = (elt, index) => {
   return [h, s, newL, ...rest].join(",");
 };
 
-// This only works if every style color is defined with hsl or hsla
-const getDarkStyle = (lightStyle) =>
-  JSON.parse(
-    JSON.stringify(lightStyle)
-      .split("hsl(")
-      .map(darkenHsl)
-      .join("hsl(")
-      .split("hsla(")
-      .map(darkenHsl)
-      .join("hsla(")
-  );
+const rDeepSearch = (elt, lambda) => {
+  if (Array.isArray(elt)) {
+    return elt.map((_) => rDeepSearch(_, lambda));
+  } else if (elt === Object(elt)) {
+    return Object.entries(elt).reduce(
+      (acc, [key, value]) => ({
+        ...acc,
+        [key]: rDeepSearch(value, lambda),
+      }),
+      {}
+    );
+  }
+  return lambda(elt);
+};
 
-const mapboxDarkStyle = getDarkStyle(mapboxLightStyle);
+const colorStartKeys = ["rgb(", "rgba(", "#", "hsl(", "hsla("];
+const mapboxDarkStyle = rDeepSearch(mapboxLightStyle, (value) => {
+  const strValue = String(value);
+  if (!colorStartKeys.some((_) => strValue.startsWith(_))) return value;
+  const color = Color(value);
+  return darkenHsl(color.hsl().string());
+});
 
 const BoundsMapping = ({ bounds, setBounds }) => {
   const map = useContext(Mapbox);
