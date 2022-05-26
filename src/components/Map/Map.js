@@ -11,6 +11,7 @@ import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import { useTheme } from "@material-ui/core/styles";
 import Color from "color";
+import AcColor from "ac-colors";
 
 import { SearchBox, MapPath, PathDetails } from "components";
 import { Mapbox } from "contexts";
@@ -72,15 +73,28 @@ const getTitle = (path, locationText) => {
   return `${distanceText} near ${locationText} - ManuPath`;
 };
 
-// we use a pow < 1 in order to prevent contrast to crunch between dark colors
+const MIN_DARK_LUM = 5;
+const MAX_DARK_LUM = 100;
+const DARK_AMP = MAX_DARK_LUM - MIN_DARK_LUM;
+// we use a power < 1 in order to prevent contrast to crunch between dark colors
+const DARK_TRANSFORM_POWER = 0.75;
+const bijection = (_) => Math.pow(1 - _, DARK_TRANSFORM_POWER);
+
 const darkenLuminosity = (l) => {
-  return Math.round(100 * Math.pow(1 - l / 100, 0.9));
+  return Math.round(MIN_DARK_LUM + DARK_AMP * bijection(l / 100));
 };
 
 const darkenColor = (colorString) => {
   const colorObject = Color(colorString).hsl().object();
-  colorObject.l = darkenLuminosity(colorObject.l);
-  return Color(colorObject).string();
+  const { h, s, l, alpha = 1 } = colorObject;
+  const color = new AcColor({ color: [h, s, l], type: "hsl" });
+  const [colorL, colorC, colorH] = color.lchab;
+  const darkenColor = new AcColor({
+    color: [darkenLuminosity(colorL), colorC, colorH],
+    type: "lchab",
+  });
+  const [r, g, b] = darkenColor.rgb;
+  return Color({ r, g, b, alpha }).string();
 };
 
 const rDeepSearch = (elt, lambda) => {
