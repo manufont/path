@@ -77,12 +77,10 @@ const darkenLuminosity = (l) => {
   return Math.round(100 * Math.pow(1 - l / 100, 0.9));
 };
 
-const darkenHsl = (elt, index) => {
-  const [h, s, l, ...rest] = elt.split(",");
-  const [value, ...valueRest] = l.split("%");
-  const newValue = darkenLuminosity(parseInt(value));
-  const newL = [newValue, ...valueRest].join("%");
-  return [h, s, newL, ...rest].join(",");
+const darkenColor = (colorString) => {
+  const colorObject = Color(colorString).hsl().object();
+  colorObject.l = darkenLuminosity(colorObject.l);
+  return Color(colorObject).string();
 };
 
 const rDeepSearch = (elt, lambda) => {
@@ -104,8 +102,7 @@ const colorStartKeys = ["rgb(", "rgba(", "#", "hsl(", "hsla("];
 const mapboxDarkStyle = rDeepSearch(mapboxLightStyle, (value) => {
   const strValue = String(value);
   if (!colorStartKeys.some((_) => strValue.startsWith(_))) return value;
-  const color = Color(value);
-  return darkenHsl(color.hsl().string());
+  return darkenColor(value);
 });
 
 const BoundsMapping = ({ bounds, setBounds }) => {
