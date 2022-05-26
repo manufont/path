@@ -73,11 +73,11 @@ const getTitle = (path, locationText) => {
   return `${distanceText} near ${locationText} - ManuPath`;
 };
 
-const MIN_DARK_LUM = 5;
+const MIN_DARK_LUM = 0;
 const MAX_DARK_LUM = 100;
 const DARK_AMP = MAX_DARK_LUM - MIN_DARK_LUM;
 // we use a power < 1 in order to prevent contrast to crunch between dark colors
-const DARK_TRANSFORM_POWER = 0.75;
+const DARK_TRANSFORM_POWER = 0.6;
 const bijection = (_) => Math.pow(1 - _, DARK_TRANSFORM_POWER);
 
 const darkenLuminosity = (l) => {
