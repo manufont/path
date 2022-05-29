@@ -218,6 +218,11 @@ const Map = () => {
     [theme]
   );
 
+  const clearPath = () => {
+    setWaypoints([]);
+    setShowSettings(false);
+  };
+
   const onPlaceSelect = (place) => {
     if (!place) return;
     const newLocation = place.geometry.coordinates;
@@ -227,7 +232,7 @@ const Map = () => {
     }
     setLocationText(photonToString(place));
     setLocation(newLocation, true);
-    setWaypoints([]);
+    clearPath();
     setBounds(newBounds);
   };
 
@@ -243,16 +248,16 @@ const Map = () => {
 
   const onSearchBoxLocationChange = async (location) => {
     if (location === null) {
-      setWaypoints([]);
+      clearPath();
     }
     setLocationFromPoint(location);
   };
 
-  const [showOptions, setShowOptions] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   return (
     <div className={styles.mapContainer}>
-      <div className={styles.searchBox}>
+      <div className={styles.boxes}>
         <Card>
           <CardContent className={styles.cardContent}>
             <SearchBox
@@ -264,7 +269,7 @@ const Map = () => {
           </CardContent>
         </Card>
         {location && (
-          <Card>
+          <Card className={styles.expandableBox}>
             <Tabs value={mode} onChange={(e, _) => setMode(_, true)} centered textColor="primary">
               <Tab wrapped icon={<DirectionsRunIcon />} value="running" />
               <Tab wrapped icon={<DirectionsBikeIcon />} value="cycling" />
@@ -279,9 +284,9 @@ const Map = () => {
               setUseRoads={setUseRoads}
               avoidBadSurfaces={avoidBadSurfaces}
               setAvoidBadSurfaces={setAvoidBadSurfaces}
-              setWaypoints={setWaypoints}
-              showOptions={showOptions}
-              setShowOptions={setShowOptions}
+              clearPath={clearPath}
+              showSettings={showSettings}
+              setShowSettings={setShowSettings}
             />
           </Card>
         )}

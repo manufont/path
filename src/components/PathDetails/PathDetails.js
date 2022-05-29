@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Divider from "@material-ui/core/Divider";
 import Accordion from "@material-ui/core/Accordion";
 import AccordionDetails from "@material-ui/core/AccordionDetails";
 import AccordionSummary from "@material-ui/core/AccordionSummary";
@@ -10,9 +11,15 @@ import LinearProgress from "@material-ui/core/LinearProgress";
 import SettingsIcon from "@material-ui/icons/Settings";
 import ShareIcon from "@material-ui/icons/Share";
 import ClearIcon from "@material-ui/icons/Clear";
+import MoreVertIcon from "@material-ui/icons/MoreVert";
+import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import Slider from "@material-ui/core/Slider";
 import Input from "@material-ui/core/Input";
 import MuiAlert from "@material-ui/lab/Alert";
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import ListItemText from "@material-ui/core/ListItemText";
 
 import { formatDuration } from "helpers/date";
 import { useBufferedState } from "hooks";
@@ -54,11 +61,12 @@ const PathDetails = ({
   setUseRoads,
   avoidBadSurfaces,
   setAvoidBadSurfaces,
-  setWaypoints,
+  clearPath,
   mode,
-  showOptions,
-  setShowOptions,
+  showSettings,
+  setShowSettings,
 }) => {
+  const [anchorEl, setAnchorEl] = useState(null);
   const [instantSpeed, setInstantSpeed] = useBufferedState(speed, setSpeed, 200);
   const [instantUseRoads, setInstantUseRoads] = useBufferedState(useRoads, setUseRoads, 200);
   const [instantAvoidBadSurfaces, setInstantAvoidBadSurfaces] = useBufferedState(
@@ -68,6 +76,10 @@ const PathDetails = ({
   );
   const [snackbarOpen, setSnackbarOpen] = useState(false);
 
+  const closeMenu = () => {
+    setAnchorEl(null);
+  };
+
   const onShareClick = (e) => {
     e.stopPropagation();
     if (navigator.share) {
@@ -76,11 +88,18 @@ const PathDetails = ({
       copyUrlToClipboard();
       setSnackbarOpen(true);
     }
+    closeMenu();
+  };
+
+  const onSettingsClick = (e) => {
+    setShowSettings(true);
+    closeMenu();
   };
 
   const onClear = (e) => {
     e.stopPropagation();
-    setWaypoints([], true);
+    clearPath();
+    closeMenu();
   };
 
   const closeSnackbar = (e) => {
@@ -88,15 +107,23 @@ const PathDetails = ({
     setSnackbarOpen(false);
   };
 
+  const onMenuButtonClick = (e) => {
+    e.stopPropagation();
+    setAnchorEl(e.currentTarget);
+  };
+
   return (
     <Accordion
       className={styles.root}
-      expanded={showOptions}
-      onChange={(e, isExpanded) => setShowOptions(isExpanded)}
+      expanded={showSettings}
+      onChange={(e, isExpanded) => setShowSettings(isExpanded)}
     >
       <AccordionSummary
-        expandIcon={<SettingsIcon />}
-        classes={{ content: styles.accordionContent, expanded: styles.accordionExpanded }}
+        classes={{
+          root: styles.accordionRoot,
+          content: styles.accordionContent,
+          expanded: styles.accordionExpanded,
+        }}
       >
         <div className={styles.summary}>
           {path ? (
@@ -107,14 +134,9 @@ const PathDetails = ({
               <IconButton className={styles.shareButton} onClick={onClear}>
                 <ClearIcon />
               </IconButton>
-              <IconButton className={styles.shareButton} onClick={onShareClick}>
-                <ShareIcon />
+              <IconButton className={styles.shareButton} onClick={onMenuButtonClick}>
+                <MoreVertIcon />
               </IconButton>
-              <Snackbar open={snackbarOpen} autoHideDuration={2000} onClose={closeSnackbar}>
-                <MuiAlert variant="filled" onClose={closeSnackbar} severity="success">
-                  URL copied to clipboard !
-                </MuiAlert>
-              </Snackbar>
             </>
           ) : pathLoading ? (
             <LinearProgress className={styles.progress} />
@@ -123,8 +145,42 @@ const PathDetails = ({
           )}
         </div>
       </AccordionSummary>
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={closeMenu}>
+        <MenuItem onClick={onShareClick}>
+          <ListItemIcon>
+            <ShareIcon />
+          </ListItemIcon>
+          <ListItemText>Share</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={onSettingsClick}>
+          <ListItemIcon>
+            <SettingsIcon />
+          </ListItemIcon>
+          <ListItemText>{showSettings ? "Hide" : "Show"} settings</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={onClear}>
+          <ListItemIcon>
+            <ClearIcon />
+          </ListItemIcon>
+          <ListItemText>Clear</ListItemText>
+        </MenuItem>
+      </Menu>
+      <Snackbar open={snackbarOpen} autoHideDuration={2000} onClose={closeSnackbar}>
+        <MuiAlert variant="filled" onClose={closeSnackbar} severity="success">
+          URL copied to clipboard !
+        </MuiAlert>
+      </Snackbar>
       <AccordionDetails className={styles.accordionDetails}>
+        <Divider />
         <div>
+          <div className={styles.settingsTitle}>
+            <Typography variant="h6" color="textSecondary">
+              Path settings
+            </Typography>
+            <IconButton onClick={() => setShowSettings(false)}>
+              <ExpandLessIcon />
+            </IconButton>
+          </div>
           <Typography id="continuous-slider" gutterBottom>
             Speed
           </Typography>

@@ -5,6 +5,10 @@
   min-height: 48px;
 }
 
+.accordionRoot {
+  padding-right: 4px;
+}
+
 .accordionContent {
   margin: 6px 0;
 }
@@ -34,6 +38,7 @@
 
 .accordionDetails {
   flex-direction: column;
+  padding-top: 0;
 }
 
 .progress {
@@ -42,4 +47,11 @@
 
 .pathDescription {
   flex: 1;
+}
+
+.settingsTitle {
+  padding-left: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
