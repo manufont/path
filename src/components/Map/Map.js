@@ -248,6 +248,8 @@ const Map = () => {
     setLocationFromPoint(location);
   };
 
+  const [showOptions, setShowOptions] = useState(false);
+
   return (
     <div className={styles.mapContainer}>
       <div className={styles.searchBox}>
@@ -260,27 +262,29 @@ const Map = () => {
               setLocation={onSearchBoxLocationChange}
             />
           </CardContent>
-          {location && (
-            <>
-              <Tabs value={mode} onChange={(e, _) => setMode(_, true)} centered textColor="primary">
-                <Tab wrapped icon={<DirectionsRunIcon />} value="running" />
-                <Tab wrapped icon={<DirectionsBikeIcon />} value="cycling" />
-              </Tabs>
-              <PathDetails
-                mode={mode}
-                path={path}
-                pathLoading={pathLoading}
-                speed={speed}
-                setSpeed={setSpeed}
-                useRoads={useRoads}
-                setUseRoads={setUseRoads}
-                avoidBadSurfaces={avoidBadSurfaces}
-                setAvoidBadSurfaces={setAvoidBadSurfaces}
-                setWaypoints={setWaypoints}
-              />
-            </>
-          )}
         </Card>
+        {location && (
+          <Card>
+            <Tabs value={mode} onChange={(e, _) => setMode(_, true)} centered textColor="primary">
+              <Tab wrapped icon={<DirectionsRunIcon />} value="running" />
+              <Tab wrapped icon={<DirectionsBikeIcon />} value="cycling" />
+            </Tabs>
+            <PathDetails
+              mode={mode}
+              path={path}
+              pathLoading={pathLoading}
+              speed={speed}
+              setSpeed={setSpeed}
+              useRoads={useRoads}
+              setUseRoads={setUseRoads}
+              avoidBadSurfaces={avoidBadSurfaces}
+              setAvoidBadSurfaces={setAvoidBadSurfaces}
+              setWaypoints={setWaypoints}
+              showOptions={showOptions}
+              setShowOptions={setShowOptions}
+            />
+          </Card>
+        )}
 
         <Snackbar open={snackbarOpen}>
           <Alert

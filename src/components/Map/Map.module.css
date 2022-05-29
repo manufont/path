@@ -17,8 +17,12 @@
   position: absolute;
   top: 16px;
   left: 16px;
-  width: 420px;
+  width: 360px;
   z-index: 1;
+}
+
+.searchBox > *:not(:first-child) {
+  margin-top: 16px;
 }
 
 /* on mobile */
@@ -27,5 +31,9 @@
     position: initial;
     width: 100%;
     border-radius: unset;
+  }
+
+  .searchBox > *:not(:first-child) {
+    margin-top: -6px;
   }
 }

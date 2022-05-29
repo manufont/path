@@ -56,6 +56,8 @@ const PathDetails = ({
   setAvoidBadSurfaces,
   setWaypoints,
   mode,
+  showOptions,
+  setShowOptions,
 }) => {
   const [instantSpeed, setInstantSpeed] = useBufferedState(speed, setSpeed, 200);
   const [instantUseRoads, setInstantUseRoads] = useBufferedState(useRoads, setUseRoads, 200);
@@ -87,7 +89,11 @@ const PathDetails = ({
   };
 
   return (
-    <Accordion className={styles.root}>
+    <Accordion
+      className={styles.root}
+      expanded={showOptions}
+      onChange={(e, isExpanded) => setShowOptions(isExpanded)}
+    >
       <AccordionSummary
         expandIcon={<SettingsIcon />}
         classes={{ content: styles.accordionContent, expanded: styles.accordionExpanded }}
