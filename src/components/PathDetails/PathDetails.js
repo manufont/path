@@ -21,20 +21,12 @@ import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
+import copy from "clipboard-copy";
 
 import { formatDuration } from "helpers/date";
 import { useBufferedState } from "hooks";
 
 import styles from "./PathDetails.module.css";
-
-const copyUrlToClipboard = () => {
-  const dummy = document.createElement("input");
-  document.body.appendChild(dummy);
-  dummy.value = document.URL;
-  dummy.select();
-  document.execCommand("copy");
-  document.body.removeChild(dummy);
-};
 
 const share = () => {
   navigator.share({
@@ -86,8 +78,8 @@ const PathDetails = ({
     closeMenu();
   };
 
-  const onCopyLinkClick = () => {
-    copyUrlToClipboard();
+  const onCopyLinkClick = (e) => {
+    copy(document.URL);
     setSnackbarOpen(true);
     closeMenu();
   };
