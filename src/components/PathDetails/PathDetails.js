@@ -13,6 +13,7 @@ import ShareIcon from "@material-ui/icons/Share";
 import ClearIcon from "@material-ui/icons/Clear";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
+import FileCopyIcon from "@material-ui/icons/FileCopy";
 import Slider from "@material-ui/core/Slider";
 import Input from "@material-ui/core/Input";
 import MuiAlert from "@material-ui/lab/Alert";
@@ -81,17 +82,17 @@ const PathDetails = ({
   };
 
   const onShareClick = (e) => {
-    e.stopPropagation();
-    if (navigator.share) {
-      share();
-    } else {
-      copyUrlToClipboard();
-      setSnackbarOpen(true);
-    }
+    share();
     closeMenu();
   };
 
-  const onSettingsClick = (e) => {
+  const onCopyLinkClick = () => {
+    copyUrlToClipboard();
+    setSnackbarOpen(true);
+    closeMenu();
+  };
+
+  const onSettingsClick = () => {
     setShowSettings(true);
     closeMenu();
   };
@@ -146,11 +147,19 @@ const PathDetails = ({
         </div>
       </AccordionSummary>
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={closeMenu}>
-        <MenuItem onClick={onShareClick}>
+        {Boolean(navigator.share) && (
+          <MenuItem onClick={onShareClick}>
+            <ListItemIcon>
+              <ShareIcon />
+            </ListItemIcon>
+            <ListItemText>Share</ListItemText>
+          </MenuItem>
+        )}
+        <MenuItem onClick={onCopyLinkClick}>
           <ListItemIcon>
-            <ShareIcon />
+            <FileCopyIcon />
           </ListItemIcon>
-          <ListItemText>Share</ListItemText>
+          <ListItemText>Copy link</ListItemText>
         </MenuItem>
         <MenuItem onClick={onSettingsClick}>
           <ListItemIcon>
@@ -173,7 +182,7 @@ const PathDetails = ({
       <AccordionDetails className={styles.accordionDetails}>
         <Divider />
         <div>
-          <div className={styles.settingsTitle}>
+          <div className={styles.settingsTitle} onClick={() => setShowSettings(false)}>
             <Typography variant="h6" color="textSecondary">
               Path settings
             </Typography>
