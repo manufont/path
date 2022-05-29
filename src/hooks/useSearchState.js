@@ -26,7 +26,7 @@ const useSearchState = (searchParam, defaultValue, encoder = noopEncoder) => {
       const searchObj = queryString.parse(history.location.search);
       const newSearchObj = { ...searchObj, [searchParam]: value };
       const search = queryString.stringify(newSearchObj);
-      return { ...history.location, search, state: { origin: "useSearchState" } };
+      return { ...history.location, search };
     },
     [searchParam, history]
   );

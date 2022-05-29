@@ -63,6 +63,33 @@ export const boundsCenter = (bounds) => [
   avg([bounds[0][1], bounds[1][1]]),
 ];
 
+export const getBoundsFromPoints = (points) => {
+  const [first, ...rest] = points;
+  const min = first.slice();
+  const max = first.slice();
+  if (rest) {
+    rest.forEach(([lng, lat]) => {
+      if (lng < min[0]) min[0] = lng;
+      if (lng > max[0]) max[0] = lng;
+      if (lat < min[1]) min[1] = lat;
+      if (lat > max[1]) max[1] = lat;
+    });
+  }
+  return [min, max];
+};
+
+export const addBoundsMargin = (bounds, relativeMargin) => {
+  const [southWest, northEast] = bounds;
+  const [minLon, minLat] = southWest;
+  const [maxLon, maxLat] = northEast;
+  const lonMargin = (maxLon - minLon) * relativeMargin;
+  const latMargin = (maxLat - minLat) * relativeMargin;
+  return [
+    [minLon - lonMargin, minLat - latMargin],
+    [maxLon + lonMargin, maxLat + latMargin],
+  ];
+};
+
 const pEncode = (points) => polyline.encode(points, PATH_PRECISION);
 const pDecode = (str) => polyline.decode(str, PATH_PRECISION);
 

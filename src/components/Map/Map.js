@@ -17,7 +17,6 @@ import { SearchBox, MapPath, PathDetails } from "components";
 import { Mapbox } from "contexts";
 import { useSearchState, usePath, useTitle, useDidUpdateEffect } from "hooks";
 import {
-  boundsEncoder,
   latLngEncoder,
   boundsCmp,
   franceBounds,
@@ -26,6 +25,8 @@ import {
   getWaypointsFromPath,
   pathEncoder,
   toPrecision,
+  getBoundsFromPoints,
+  addBoundsMargin,
 } from "helpers/geo";
 import { photonToString, getPhotonFromLocation } from "helpers/photon";
 
@@ -156,7 +157,6 @@ const BoundsMapping = ({ bounds, setBounds }) => {
 };
 
 const Map = () => {
-  const [bounds, setBounds] = useSearchState("b", franceBounds, boundsEncoder);
   const [location, setLocation] = useSearchState("l", null, latLngEncoder);
   const [waypoints, setWaypoints] = useSearchState("p", defaultPath, pathEncoder);
   const [locationText, setLocationText] = useSearchState("q", "");
@@ -181,6 +181,14 @@ const Map = () => {
   const [path, pathLoading, pathError] = usePath(location, waypoints, pathOptions);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const theme = useTheme();
+
+  const defaultBounds = useMemo(() => {
+    if (!location) return franceBounds;
+    if (waypoints.length === 0) return boundsFromPoint(location);
+    return addBoundsMargin(getBoundsFromPoints([location, ...waypoints]), 0.5);
+  }, [location, waypoints]);
+
+  const [bounds, setBounds] = useState(defaultBounds);
 
   useDidUpdateEffect(() => {
     if (mode === "running") {
