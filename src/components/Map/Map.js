@@ -121,7 +121,7 @@ const mapboxDarkStyle = rDeepSearch(mapboxLightStyle, (value) => {
 });
 
 const BoundsMapping = ({ bounds, setBounds }) => {
-  const map = useContext(Mapbox);
+  const { map } = useContext(Mapbox);
 
   // url -> map binding
   useEffect(() => {
@@ -303,15 +303,17 @@ const Map = () => {
           </Alert>
         </Snackbar>
       </div>
-      <Mapbox.Provider options={mapOptions} style={{ flex: 1 }}>
-        <BoundsMapping bounds={bounds} setBounds={setBounds} />
-        <MapPath
-          location={location}
-          setLocation={setLocationFromPoint}
-          waypoints={waypoints}
-          setWaypoints={setWaypoints}
-          path={path}
-        />
+      <Mapbox.Provider>
+        <Mapbox.Map options={mapOptions} style={{ flex: 1 }}>
+          <BoundsMapping bounds={bounds} setBounds={setBounds} />
+          <MapPath
+            location={location}
+            setLocation={setLocationFromPoint}
+            waypoints={waypoints}
+            setWaypoints={setWaypoints}
+            path={path}
+          />
+        </Mapbox.Map>
       </Mapbox.Provider>
     </div>
   );

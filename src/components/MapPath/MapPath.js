@@ -5,7 +5,7 @@ import { Mapbox } from "contexts";
 import { last } from "helpers/methods";
 
 const MapHoveredWaypoint = ({ feature, onDragEnd }) => {
-  const map = useContext(Mapbox);
+  const { map } = useContext(Mapbox);
 
   useEffect(() => {
     let source = map.getSource("hovered-waypoint");
@@ -52,7 +52,7 @@ const MapHoveredWaypoint = ({ feature, onDragEnd }) => {
 };
 
 const MapWaypoints = ({ waypoints, setWaypoints, setHoveredFeature }) => {
-  const map = useContext(Mapbox);
+  const { map } = useContext(Mapbox);
 
   useEffect(() => {
     const sourceData = {
@@ -126,7 +126,7 @@ const MapWaypoints = ({ waypoints, setWaypoints, setHoveredFeature }) => {
 };
 
 const MapLocation = ({ location, setLocation }) => {
-  const map = useContext(Mapbox);
+  const { map } = useContext(Mapbox);
   useEffect(() => {
     const sourceData = {
       type: "Feature",
@@ -186,7 +186,7 @@ const MapLocation = ({ location, setLocation }) => {
 };
 
 const MapPolyline = ({ path, setHoveredFeature }) => {
-  const map = useContext(Mapbox);
+  const { map } = useContext(Mapbox);
 
   useEffect(() => {
     if (!path) return;
@@ -391,7 +391,7 @@ const MapPolyline = ({ path, setHoveredFeature }) => {
 };
 
 const MapPath = ({ location, setLocation, waypoints, setWaypoints, path }) => {
-  const map = useContext(Mapbox);
+  const { map } = useContext(Mapbox);
   const [hoveredFeature, setHoveredFeature] = useState(null);
 
   useEffect(() => {

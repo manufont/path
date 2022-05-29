@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect } from "react";
+import React, { useCallback, useState, useEffect, useContext } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
@@ -92,22 +92,30 @@ const enhanceMap = (map) => {
   return map;
 };
 
-export const MapboxProvider = ({ children, token, options, ...containerProps }) => {
-  const [container, setContainer] = useState(null);
+const MapboxProvider = ({ children }) => {
+  const [mapState, setMapState] = useState(null);
   const [map, setMap] = useState(null);
 
-  const containerRef = useCallback(
-    (node) => {
-      if (node && !container) {
-        setContainer(node);
+  const registerMap = useCallback(
+    (newMapState) => {
+      if (!mapState) {
+        setMapState(newMapState);
+        return;
       }
+      const savedContainer = mapState.container;
+      const { container } = newMapState;
+      if (savedContainer === container) return;
+      const parentNode = container.parentNode;
+      parentNode.removeChild(container);
+      parentNode.appendChild(savedContainer);
+      map.resize();
     },
-    [container]
+    [map, mapState]
   );
 
   useEffect(() => {
-    if (container === null) return;
-    mapboxgl.accessToken = token;
+    if (mapState === null) return;
+    const { container, options } = mapState;
     const mapboxMap = new mapboxgl.Map({
       container,
       ...options,
@@ -117,15 +125,38 @@ export const MapboxProvider = ({ children, token, options, ...containerProps }) 
     return () => {
       mapboxMap.off("load", onMapLoad);
     };
-  }, [container, token, options]);
+  }, [mapState]);
+
+  return <OriginalProvider value={{ map, registerMap }}>{children}</OriginalProvider>;
+};
+
+const Map = ({ children, options, ...containerProps }) => {
+  const { map, registerMap } = useContext(MapboxContext);
+
+  const containerRef = useCallback((node) => {
+    if (!node) return;
+    registerMap({
+      container: node,
+      options,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div ref={containerRef} {...containerProps}>
-      {map && <OriginalProvider value={map}>{children}</OriginalProvider>}
+      {map && children}
     </div>
   );
 };
 
+const Consumer = ({ children }) => {
+  const { map } = useContext(MapboxContext);
+
+  return map && children;
+};
+
 MapboxContext.Provider = MapboxProvider;
+MapboxContext.Map = Map;
+MapboxContext.Consumer = Consumer;
 
 export default MapboxContext;
