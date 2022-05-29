@@ -57,6 +57,11 @@ const SearchBox = ({ mapCenter, onPlaceSelect, defaultSearchText, setLocation })
     );
   };
 
+  const onInputClear = () => {
+    setLocation(null);
+    setSearchText("");
+  };
+
   return (
     <Autocomplete
       freeSolo
@@ -88,7 +93,7 @@ const SearchBox = ({ mapCenter, onPlaceSelect, defaultSearchText, setLocation })
               <InputAdornment position="end">
                 {searchText && (
                   <>
-                    <IconButton onClick={() => setSearchText("")}>
+                    <IconButton onClick={onInputClear}>
                       <ClearIcon />
                     </IconButton>
                     {!hideGeolocation && (

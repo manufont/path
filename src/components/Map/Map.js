@@ -225,11 +225,19 @@ const Map = () => {
 
   const setLocationFromPoint = async (location) => {
     setLocation(location);
+    if (!location) return;
     setBounds(boundsFromPoint(location));
     const photon = await getPhotonFromLocation(location);
     if (photon) {
       setLocationText(photonToString(photon));
     }
+  };
+
+  const onSearchBoxLocationChange = async (location) => {
+    if (location === null) {
+      setWaypoints([]);
+    }
+    setLocationFromPoint(location);
   };
 
   return (
@@ -241,7 +249,7 @@ const Map = () => {
               defaultSearchText={locationText}
               mapCenter={boundsCenter(bounds)}
               onPlaceSelect={onPlaceSelect}
-              setLocation={setLocationFromPoint}
+              setLocation={onSearchBoxLocationChange}
             />
           </CardContent>
           {location && (
