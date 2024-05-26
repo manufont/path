@@ -14,6 +14,7 @@ import ClearIcon from "@material-ui/icons/Clear";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import FileCopyIcon from "@material-ui/icons/FileCopy";
+import GetAppIcon from "@material-ui/icons/GetApp";
 import Slider from "@material-ui/core/Slider";
 import Input from "@material-ui/core/Input";
 import MuiAlert from "@material-ui/lab/Alert";
@@ -24,6 +25,7 @@ import ListItemText from "@material-ui/core/ListItemText";
 import copy from "clipboard-copy";
 
 import { formatDuration } from "helpers/date";
+import { downloadGPX } from "helpers/gpx";
 import { useBufferedState } from "hooks";
 
 import styles from "./PathDetails.module.css";
@@ -105,6 +107,11 @@ const PathDetails = ({
     setAnchorEl(e.currentTarget);
   };
 
+  const onDownloadGPXClick = () => {
+    downloadGPX(path, document.title);
+    closeMenu();
+  };
+
   return (
     <Accordion
       className={styles.root}
@@ -152,6 +159,12 @@ const PathDetails = ({
             <FileCopyIcon />
           </ListItemIcon>
           <ListItemText>Copy link</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={onDownloadGPXClick}>
+          <ListItemIcon>
+            <GetAppIcon />
+          </ListItemIcon>
+          <ListItemText>Export GPX</ListItemText>
         </MenuItem>
         <MenuItem onClick={onSettingsClick}>
           <ListItemIcon>
