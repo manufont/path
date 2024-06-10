@@ -1,4 +1,4 @@
-export const formatDuration = (seconds) => {
+export const formatDuration = (seconds: number) => {
   let acc = seconds;
   const hours = Math.floor(acc / 3600);
   acc %= 3600;

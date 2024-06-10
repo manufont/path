@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Divider from "@material-ui/core/Divider";
 import Accordion from "@material-ui/core/Accordion";
 import AccordionDetails from "@material-ui/core/AccordionDetails";
@@ -27,6 +27,7 @@ import copy from "clipboard-copy";
 import { formatDuration } from "helpers/date";
 import { downloadGPX } from "helpers/gpx";
 import { useBufferedState } from "hooks";
+import { Path } from "hooks/usePath";
 
 import styles from "./PathDetails.module.css";
 
@@ -37,7 +38,11 @@ const share = () => {
   });
 };
 
-const PathDescription = ({ path }) => {
+type PathDescriptionProps = {
+  path: Path;
+};
+
+const PathDescription = ({ path }: PathDescriptionProps) => {
   const { summary } = path.trip;
   const { length, time } = summary;
   return (
@@ -45,6 +50,21 @@ const PathDescription = ({ path }) => {
       <strong>{length.toFixed(1)} km</strong>, {formatDuration(time)}
     </>
   );
+};
+
+type PathDetailsProps = {
+  path: Path | null;
+  pathLoading: boolean;
+  speed: number;
+  setSpeed: (speed: number) => void;
+  useRoads: number;
+  setUseRoads: (useRoads: number) => void;
+  avoidBadSurfaces: number;
+  setAvoidBadSurfaces: (avoidBadSurfaces: number) => void;
+  clearPath: () => void;
+  mode: "running" | "cycling";
+  showSettings: boolean;
+  setShowSettings: (showSettings: boolean) => void;
 };
 
 const PathDetails = ({
@@ -60,8 +80,8 @@ const PathDetails = ({
   mode,
   showSettings,
   setShowSettings,
-}) => {
-  const [anchorEl, setAnchorEl] = useState(null);
+}: PathDetailsProps) => {
+  const [anchorEl, setAnchorEl] = useState<Element | null>(null);
   const [instantSpeed, setInstantSpeed] = useBufferedState(speed, setSpeed, 200);
   const [instantUseRoads, setInstantUseRoads] = useBufferedState(useRoads, setUseRoads, 200);
   const [instantAvoidBadSurfaces, setInstantAvoidBadSurfaces] = useBufferedState(
@@ -75,12 +95,12 @@ const PathDetails = ({
     setAnchorEl(null);
   };
 
-  const onShareClick = (e) => {
+  const onShareClick = () => {
     share();
     closeMenu();
   };
 
-  const onCopyLinkClick = (e) => {
+  const onCopyLinkClick = () => {
     copy(document.URL);
     setSnackbarOpen(true);
     closeMenu();
@@ -91,23 +111,26 @@ const PathDetails = ({
     closeMenu();
   };
 
-  const onClear = (e) => {
+  const onClear = (e: React.MouseEvent) => {
     e.stopPropagation();
     clearPath();
     closeMenu();
   };
 
-  const closeSnackbar = (e) => {
+  const closeSnackbar = (e?: React.SyntheticEvent) => {
     e && e.stopPropagation();
     setSnackbarOpen(false);
   };
 
-  const onMenuButtonClick = (e) => {
+  const onMenuButtonClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setAnchorEl(e.currentTarget);
+    if (e.currentTarget) {
+      setAnchorEl(e.currentTarget);
+    }
   };
 
   const onDownloadGPXClick = () => {
+    if(!path) return;
     downloadGPX(path, document.title);
     closeMenu();
   };
@@ -202,7 +225,7 @@ const PathDetails = ({
             <Slider
               value={instantSpeed}
               className={styles.speedSlider}
-              onChange={(e, value) => setInstantSpeed(value)}
+              onChange={(e, value) => setInstantSpeed(Number(value))}
               min={mode === "running" ? 4 : 12}
               max={mode === "running" ? 25 : 45}
               step={1}
@@ -211,7 +234,7 @@ const PathDetails = ({
             <Input
               value={instantSpeed}
               margin="dense"
-              onChange={(e) => setInstantSpeed(e.target.value)}
+              onChange={(e) => setInstantSpeed(Number(e.target.value))}
               endAdornment={<InputAdornment position="end">Km/h</InputAdornment>}
               inputProps={{
                 step: 1,
@@ -230,7 +253,7 @@ const PathDetails = ({
               <div className={styles.sliderContainer}>
                 <Slider
                   value={instantUseRoads}
-                  onChange={(e, value) => setInstantUseRoads(value)}
+                  onChange={(e, value) => setInstantUseRoads(Number(value))}
                   marks={[
                     { value: 0, label: "No" },
                     { value: 0.5, label: "Maybe" },
@@ -247,7 +270,7 @@ const PathDetails = ({
               <div className={styles.sliderContainer}>
                 <Slider
                   value={instantAvoidBadSurfaces}
-                  onChange={(e, value) => setInstantAvoidBadSurfaces(value)}
+                  onChange={(e, value) => setInstantAvoidBadSurfaces(Number(value))}
                   marks={[
                     { value: 0, label: "No" },
                     { value: 0.5, label: "Maybe" },

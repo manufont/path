@@ -10,19 +10,27 @@ import queryString from "query-string";
 import cn from "classnames";
 
 import { bufferize } from "helpers/methods";
-import { photonToIcon, photonToString } from "helpers/photon";
+import { PhotonFeature, PhotonResponse, photonToIcon, photonToString } from "helpers/photon";
 import { useResource, useDidUpdateEffect } from "hooks";
 
 import styles from "./SearchBox.module.css";
+import { LonLat } from "helpers/geo";
 
 const PHOTON_URL = process.env.REACT_APP_PHOTON_URL;
 
-const parsePhotonResults = (results) => results.features;
+const parsePhotonResults = (results: PhotonResponse) => results.features;
 
-const SearchBox = ({ mapCenter, onPlaceSelect, defaultSearchText, setLocation }) => {
-  const [searchUrl, setSearchUrl] = useState(null);
+type SearchBoxProps = {
+  mapCenter: LonLat;
+  onPlaceSelect: (place: PhotonFeature) => void;
+  defaultSearchText: string;
+  setLocation: (location: LonLat | null) => void;
+}
+
+const SearchBox = ({ mapCenter, onPlaceSelect, defaultSearchText, setLocation }: SearchBoxProps) => {
+  const [searchUrl, setSearchUrl] = useState<string | null>(null);
   const [hideGeolocation, setHideGeolocation] = useState(!navigator.geolocation);
-  const [photons, loading, error] = useResource(searchUrl, parsePhotonResults);
+  const [photons, loading, error] = useResource<PhotonFeature[]>(searchUrl, parsePhotonResults);
   const [searchText, setSearchText] = useState(defaultSearchText);
 
   const bufferizedSetSearchUrl = useMemo(() => bufferize(setSearchUrl, 300), [setSearchUrl]);
@@ -46,7 +54,7 @@ const SearchBox = ({ mapCenter, onPlaceSelect, defaultSearchText, setLocation })
     setSearchText(defaultSearchText);
   }, [setSearchText, defaultSearchText]);
 
-  const geolocalize = (e) => {
+  const geolocalize: React.MouseEventHandler = (e) => {
     e.stopPropagation();
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -75,12 +83,12 @@ const SearchBox = ({ mapCenter, onPlaceSelect, defaultSearchText, setLocation })
           </span>
         );
       }}
-      onInput={(e) => setSearchText(e.target.value)}
+      onInput={(e) => setSearchText((e.target as HTMLInputElement).value)}
       onChange={(e, value) => {
-        setSearchText(photonToString(value));
-        onPlaceSelect(value);
+        setSearchText(photonToString(value as PhotonFeature));
+        onPlaceSelect(value as PhotonFeature);
       }}
-      value={{ properties: { type: "label", name: searchText } }}
+      value={{ properties: { type: "label", name: searchText }} as PhotonFeature}
       noOptionsText="No result found."
       loading={loading}
       renderInput={(params) => (

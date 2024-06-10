@@ -1,18 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { PropsWithChildren, useEffect, useState } from "react";
 import { ThemeProvider as MuiThemeProvider } from "@material-ui/core";
-import { createMuiTheme } from "@material-ui/core/styles";
+import { createTheme } from "@material-ui/core/styles";
 import green from "@material-ui/core/colors/green";
 import blueGrey from "@material-ui/core/colors/blueGrey";
 import CssBaseline from "@material-ui/core/CssBaseline";
 
-const lightTheme = createMuiTheme({
+const lightTheme = createTheme({
   palette: {
     primary: green,
     secondary: blueGrey,
   },
 });
 
-const darkTheme = createMuiTheme({
+const darkTheme = createTheme({
   palette: {
     type: "dark",
     primary: green,
@@ -22,11 +22,11 @@ const darkTheme = createMuiTheme({
 
 const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
 
-export const ThemeProvider = ({ children }) => {
+export const ThemeProvider = ({ children }: PropsWithChildren) => {
   const [theme, setTheme] = useState(prefersDark.matches ? darkTheme : lightTheme);
 
   useEffect(() => {
-    const onPrefersDarkChange = (e) => {
+    const onPrefersDarkChange = (e: MediaQueryListEvent) => {
       setTheme(e.matches ? darkTheme : lightTheme);
     };
     try {

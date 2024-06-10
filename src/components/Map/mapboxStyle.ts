@@ -1,3 +1,5 @@
+import { Style } from "mapbox-gl";
+
 const TILE_SERVER_URL = process.env.REACT_APP_TILE_SERVER_URL;
 
 const sources = {
@@ -3661,6 +3663,6 @@ const style = {
   glyphs: `${TILE_SERVER_URL}/fonts/{fontstack}/{range}.pbf`,
   layers,
   id: "basic-preview",
-};
+} as Style;
 
 export default style;

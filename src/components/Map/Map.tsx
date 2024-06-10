@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Alert from "@material-ui/lab/Alert";
 import Snackbar from "@material-ui/core/Snackbar";
 import Card from "@material-ui/core/Card";
@@ -10,42 +10,46 @@ import DirectionsBikeIcon from "@material-ui/icons/DirectionsBike";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import { useTheme } from "@material-ui/core/styles";
-import Color from "color";
-import AcColor from "ac-colors";
 
 import { SearchBox, MapPath, PathDetails } from "components";
-import { Mapbox } from "contexts";
+import { MapboxMap, MapboxProvider } from "contexts";
 import { useSearchState, usePath, useTitle, useDidUpdateEffect } from "hooks";
 import {
-  latLngEncoder,
-  boundsCmp,
+  lonLatEncoder,
   franceBounds,
   boundsCenter,
   boundsFromPoint,
   getWaypointsFromPath,
   pathEncoder,
-  toPrecision,
   getBoundsFromPoints,
   addBoundsMargin,
+  Encoder,
+  Bounds,
+  LonLat,
 } from "helpers/geo";
-import { photonToString, getPhotonFromLocation } from "helpers/photon";
+import { photonToString, getPhotonFromLocation, PhotonFeature } from "helpers/photon";
 
 import mapboxLightStyle from "./mapboxStyle";
 import styles from "./Map.module.css";
+import { rDeepSearch } from "helpers/methods";
+import { darkenColor } from "helpers/color";
+import { Path } from "hooks/usePath";
+import BoundsMapping from "./BoundsMapping";
+import { Style } from "mapbox-gl";
 
 const DEFAULT_USE_ROADS = 0.5;
 const DEFAULT_AVOID_BAD_SURFACES = 0.25;
 const DEFAULT_RUNNING_SPEED = 10;
 const DEFAULT_CYCLING_SPEED = 25;
 
-const numberEncoder = {
+const numberEncoder: Encoder<number> = {
   encode: (nb) => String(nb),
   decode: (str) => parseFloat(str),
 };
 
-const defaultPath = [];
+const defaultPath: LonLat[] = [];
 
-const getBoundsFromPlace = (place) => {
+const getBoundsFromPlace = (place: PhotonFeature): Bounds => {
   const [minLon, maxLat, maxLon, minLat] = place.properties.extent;
   return [
     [minLon, minLat],
@@ -53,17 +57,17 @@ const getBoundsFromPlace = (place) => {
   ];
 };
 
-const lngLatToBounds = (lngLat) => {
+const lngLatToBounds = (lonLat: LonLat): Bounds => {
   const latE = 0.005;
   const lngE = 0.005;
-  const [lng, lat] = lngLat;
+  const [lng, lat] = lonLat;
   return [
     [lng - lngE, lat - latE],
     [lng + lngE, lat + latE],
   ];
 };
 
-const getTitle = (path, locationText) => {
+const getTitle = (path: Path | null, locationText: string | null) => {
   if (!locationText) {
     return "ManuPath";
   }
@@ -74,93 +78,19 @@ const getTitle = (path, locationText) => {
   return `${distanceText} near ${locationText} - ManuPath`;
 };
 
-const MIN_DARK_LUM = 0;
-const MAX_DARK_LUM = 100;
-const DARK_AMP = MAX_DARK_LUM - MIN_DARK_LUM;
-// we use a power < 1 in order to prevent contrast to crunch between dark colors
-const DARK_TRANSFORM_POWER = 0.6;
-const bijection = (_) => Math.pow(1 - _, DARK_TRANSFORM_POWER);
-
-const darkenLuminosity = (l) => {
-  return Math.round(MIN_DARK_LUM + DARK_AMP * bijection(l / 100));
-};
-
-const darkenColor = (colorString) => {
-  const colorObject = Color(colorString).hsl().object();
-  const { h, s, l, alpha = 1 } = colorObject;
-  const color = new AcColor({ color: [h, s, l], type: "hsl" });
-  const [colorL, colorC, colorH] = color.lchab;
-  const darkenColor = new AcColor({
-    color: [darkenLuminosity(colorL), colorC, colorH],
-    type: "lchab",
-  });
-  const [r, g, b] = darkenColor.rgb;
-  return Color({ r, g, b, alpha }).string();
-};
-
-const rDeepSearch = (elt, lambda) => {
-  if (Array.isArray(elt)) {
-    return elt.map((_) => rDeepSearch(_, lambda));
-  } else if (elt === Object(elt)) {
-    return Object.entries(elt).reduce(
-      (acc, [key, value]) => ({
-        ...acc,
-        [key]: rDeepSearch(value, lambda),
-      }),
-      {}
-    );
-  }
-  return lambda(elt);
-};
 
 const colorStartKeys = ["rgb(", "rgba(", "#", "hsl(", "hsla("];
 const mapboxDarkStyle = rDeepSearch(mapboxLightStyle, (value) => {
   const strValue = String(value);
   if (!colorStartKeys.some((_) => strValue.startsWith(_))) return value;
   return darkenColor(value);
-});
-
-const BoundsMapping = ({ bounds, setBounds }) => {
-  const { map } = useContext(Mapbox);
-
-  // url -> map binding
-  useEffect(() => {
-    const mapBounds = map
-      .getBounds()
-      .toArray()
-      .map((_) => _.map(toPrecision));
-    if (!boundsCmp(mapBounds, bounds)) {
-      map.fitBounds(bounds, {
-        maxDuration: 2500, // 2.5 seconds
-      });
-    }
-  }, [map, bounds]);
-
-  // map -> url binding
-  useEffect(() => {
-    const onMoveEnd = () => {
-      const mapBounds = map
-        .getBounds()
-        .toArray()
-        .map((_) => _.map(toPrecision));
-      if (!boundsCmp(mapBounds, bounds)) {
-        setBounds(mapBounds);
-      }
-    };
-    map.on("moveend", onMoveEnd);
-    return () => {
-      map.off("moveend", onMoveEnd);
-    };
-  }, [map, bounds, setBounds]);
-
-  return null;
-};
+}) as Style;
 
 const Map = () => {
-  const [location, setLocation] = useSearchState("l", null, latLngEncoder);
+  const [location, setLocation] = useSearchState("l", null, lonLatEncoder);
   const [waypoints, setWaypoints] = useSearchState("p", defaultPath, pathEncoder);
   const [locationText, setLocationText] = useSearchState("q", "");
-  const [mode, setMode] = useSearchState("m", "running");
+  const [mode, setMode] = useSearchState<"running" | "cycling">("m", "running");
   const defaultSpeed = mode === "running" ? DEFAULT_RUNNING_SPEED : DEFAULT_CYCLING_SPEED;
   const [speed, setSpeed] = useSearchState("s", defaultSpeed, numberEncoder);
   const [useRoads, setUseRoads] = useSearchState("ur", DEFAULT_USE_ROADS, numberEncoder);
@@ -188,7 +118,7 @@ const Map = () => {
     return addBoundsMargin(getBoundsFromPoints([location, ...waypoints]), 0.5);
   }, [location, waypoints]);
 
-  const [bounds, setBounds] = useState(defaultBounds);
+  const [bounds, setBounds] = useState<Bounds>(defaultBounds);
 
   useDidUpdateEffect(() => {
     if (mode === "running") {
@@ -223,7 +153,7 @@ const Map = () => {
     setShowSettings(false);
   };
 
-  const onPlaceSelect = (place) => {
+  const onPlaceSelect = (place: PhotonFeature) => {
     if (!place) return;
     const newLocation = place.geometry.coordinates;
     let newBounds = lngLatToBounds(newLocation);
@@ -236,7 +166,7 @@ const Map = () => {
     setBounds(newBounds);
   };
 
-  const setLocationFromPoint = async (location) => {
+  const setLocationFromPoint = async (location: LonLat | null) => {
     setLocation(location);
     if (!location) return;
     setBounds(boundsFromPoint(location));
@@ -246,7 +176,7 @@ const Map = () => {
     }
   };
 
-  const onSearchBoxLocationChange = async (location) => {
+  const onSearchBoxLocationChange = async (location: LonLat | null) => {
     if (location === null) {
       clearPath();
     }
@@ -312,8 +242,8 @@ const Map = () => {
           </Alert>
         </Snackbar>
       </div>
-      <Mapbox.Provider>
-        <Mapbox.Map options={mapOptions} style={{ flex: 1 }}>
+      <MapboxProvider>
+        <MapboxMap options={mapOptions} style={{ flex: 1 }}>
           <BoundsMapping bounds={bounds} setBounds={setBounds} />
           <MapPath
             location={location}
@@ -322,8 +252,8 @@ const Map = () => {
             setWaypoints={setWaypoints}
             path={path}
           />
-        </Mapbox.Map>
-      </Mapbox.Provider>
+        </MapboxMap>
+      </MapboxProvider>
     </div>
   );
 };
