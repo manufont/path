@@ -2,18 +2,17 @@ import { MapboxContext } from "contexts";
 import { Bounds, boundsCmp, toPrecision } from "helpers/geo";
 import { useContext, useEffect } from "react";
 
-
 type BoundsMappingProps = {
   bounds: Bounds;
   setBounds: (bounds: Bounds) => void;
-}
+};
 
 const BoundsMapping = ({ bounds, setBounds }: BoundsMappingProps) => {
   const { map } = useContext(MapboxContext);
 
   // url -> map binding
   useEffect(() => {
-    if(!map) return;
+    if (!map) return;
     const mapBounds = map
       .getBounds()
       .toArray()
@@ -27,7 +26,7 @@ const BoundsMapping = ({ bounds, setBounds }: BoundsMappingProps) => {
 
   // map -> url binding
   useEffect(() => {
-    if(!map) return;
+    if (!map) return;
     const onMoveEnd = () => {
       const mapBounds = map
         .getBounds()

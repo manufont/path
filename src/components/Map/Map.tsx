@@ -78,7 +78,6 @@ const getTitle = (path: Path | null, locationText: string | null) => {
   return `${distanceText} near ${locationText} - ManuPath`;
 };
 
-
 const colorStartKeys = ["rgb(", "rgba(", "#", "hsl(", "hsla("];
 const mapboxDarkStyle = rDeepSearch(mapboxLightStyle, (value) => {
   const strValue = String(value);
@@ -97,7 +96,7 @@ const Map = () => {
   const [avoidBadSurfaces, setAvoidBadSurfaces] = useSearchState(
     "abs",
     DEFAULT_AVOID_BAD_SURFACES,
-    numberEncoder
+    numberEncoder,
   );
   const pathOptions = useMemo(
     () => ({
@@ -106,7 +105,7 @@ const Map = () => {
       useRoads,
       avoidBadSurfaces,
     }),
-    [mode, speed, useRoads, avoidBadSurfaces]
+    [mode, speed, useRoads, avoidBadSurfaces],
   );
   const [path, pathLoading, pathError] = usePath(location, waypoints, pathOptions);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -145,7 +144,7 @@ const Map = () => {
       bounds,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [theme]
+    [theme],
   );
 
   const clearPath = () => {

@@ -87,7 +87,7 @@ const PathDetails = ({
   const [instantAvoidBadSurfaces, setInstantAvoidBadSurfaces] = useBufferedState(
     avoidBadSurfaces,
     setAvoidBadSurfaces,
-    200
+    200,
   );
   const [snackbarOpen, setSnackbarOpen] = useState(false);
 
@@ -130,7 +130,7 @@ const PathDetails = ({
   };
 
   const onDownloadGPXClick = () => {
-    if(!path) return;
+    if (!path) return;
     downloadGPX(path, document.title);
     closeMenu();
   };

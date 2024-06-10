@@ -15,14 +15,14 @@ const noopEncoder: Encoder<any> = {
 const useSearchState = <T>(
   searchParam: string,
   defaultValue: T,
-  encoder: Encoder<T> = noopEncoder
+  encoder: Encoder<T> = noopEncoder,
 ) => {
   const { search } = useLocation();
   const searchObj = queryString.parse(search);
   const searchValue = searchObj[searchParam];
   const value = useMemo(
     () => (searchValue === undefined ? defaultValue : encoder.decode(searchValue as string)),
-    [defaultValue, encoder, searchValue]
+    [defaultValue, encoder, searchValue],
   );
   const history = useHistory();
 
@@ -33,7 +33,7 @@ const useSearchState = <T>(
       const search = queryString.stringify(newSearchObj);
       return { ...history.location, search };
     },
-    [searchParam, history]
+    [searchParam, history],
   );
 
   const setter = useCallback(
@@ -44,7 +44,7 @@ const useSearchState = <T>(
       const updateValue = push ? history.push : history.replace;
       updateValue(getNewLocation(isDefault ? undefined : newEncodedValue));
     },
-    [defaultValue, encoder, getNewLocation, history]
+    [defaultValue, encoder, getNewLocation, history],
   );
 
   return [value, setter] as const;

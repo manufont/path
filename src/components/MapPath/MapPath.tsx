@@ -116,7 +116,7 @@ const MapWaypoints = ({ waypoints, setWaypoints }: MapWaypointsProps) => {
     const onClick: DragEventListener<WaypointFeature> = (e, waypoint) => {
       setWaypoints(
         waypoints.filter((_, index) => index !== waypoint.id),
-        true
+        true,
       );
     };
 
@@ -235,17 +235,17 @@ const MapPolyline = ({ path, setHoveredFeature }: MapPolylineProps) => {
             "line-width": 40,
           },
         },
-        "waypoints-layer"
+        "waypoints-layer",
       );
 
       const onMouseMove = (e: DragEvent) => {
         e.originalEvent.stopPropagation();
         const features = map.queryRenderedFeatures(e.point);
         const feature = features.find(
-          (_) => _.layer.id === "polyline-box-layer"
+          (_) => _.layer.id === "polyline-box-layer",
         ) as unknown as GeoJSON.Feature<GeoJSON.LineString, { id: number }>;
         const onWaypoints = features.find((_) =>
-          ["waypoints-layer", "location-layer"].includes(_.layer.id)
+          ["waypoints-layer", "location-layer"].includes(_.layer.id),
         );
         if (onWaypoints) {
           setHoveredFeature(null);
@@ -294,7 +294,7 @@ const MapPolyline = ({ path, setHoveredFeature }: MapPolylineProps) => {
           "line-width": 8,
         },
       },
-      "waypoints-layer"
+      "waypoints-layer",
     );
     map.addLayerIfNotExist(
       {
@@ -310,7 +310,7 @@ const MapPolyline = ({ path, setHoveredFeature }: MapPolylineProps) => {
           "line-width": 5,
         },
       },
-      "location-layer"
+      "location-layer",
     );
   }, [map, path, setHoveredFeature]);
 
@@ -350,7 +350,7 @@ const MapPolyline = ({ path, setHoveredFeature }: MapPolylineProps) => {
           "line-width": 8,
         },
       },
-      "waypoints-layer"
+      "waypoints-layer",
     );
     map.addLayerIfNotExist(
       {
@@ -367,7 +367,7 @@ const MapPolyline = ({ path, setHoveredFeature }: MapPolylineProps) => {
           "line-width": 5,
         },
       },
-      "polyline-layer"
+      "polyline-layer",
     );
   }, [map, path]);
 
@@ -435,7 +435,7 @@ const MapPath = ({ location, setLocation, waypoints, setWaypoints, path }: MapPa
       setWaypoints(newWaypoints, true);
       setHoveredFeature(null);
     },
-    [hoveredFeature, setWaypoints, waypoints]
+    [hoveredFeature, setWaypoints, waypoints],
   );
 
   if (!location) return null;

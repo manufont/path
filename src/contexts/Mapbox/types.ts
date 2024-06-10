@@ -12,7 +12,7 @@ export type MapboxContextType = {
 
 export type DragEventListener<T extends GeoJSON.Feature = GeoJSON.Feature> = (
   e: DragEvent,
-  feature: T
+  feature: T,
 ) => void;
 
 export type WithFeatures = {
@@ -26,9 +26,9 @@ export type MapMouseEvent = mapboxgl.MapMouseEvent & WithFeatures;
 export type DragEvent = MapTouchEvent | MapMouseEvent;
 
 export type GeoJSONFeatureRaw = {
-  type: "geojson",
+  type: "geojson";
   data: GeoJSON.Feature | GeoJSON.FeatureCollection;
-}
+};
 
 export type EnhancedMap = mapboxgl.Map & {
   onLayerClick: (layerId: string, onClick: () => void) => void;
@@ -36,7 +36,7 @@ export type EnhancedMap = mapboxgl.Map & {
     layerId: string,
     onDragMove: DragEventListener<T>,
     onDragEnd: DragEventListener<T>,
-    onClick?: DragEventListener<T>
+    onClick?: DragEventListener<T>,
   ) => void;
   addLayerIfNotExist: mapboxgl.Map["addLayer"];
   addOrUpdateSource: (id: string, source: GeoJSONFeatureRaw) => GeoJSONSource;

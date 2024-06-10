@@ -9,7 +9,7 @@ function useDidUpdateEffect(effect: React.EffectCallback, inputs?: React.Depende
   useEffect(() => {
     if (!didMountRef.current) {
       didMountRef.current = true;
-    } else if(fncRef.current){
+    } else if (fncRef.current) {
       return fncRef.current();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

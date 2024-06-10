@@ -1,6 +1,5 @@
 import Color from "colorjs.io";
 
-
 const MIN_DARK_LUM = 0;
 const MAX_DARK_LUM = 100;
 const DARK_AMP = MAX_DARK_LUM - MIN_DARK_LUM;
@@ -12,7 +11,7 @@ const darkenLuminosity = (l: number) => {
   return Math.round(MIN_DARK_LUM + DARK_AMP * bijection(l / 100));
 };
 
-const toHex = (numFrom0To1: number): number => Math.round(numFrom0To1 * 256)
+const toHex = (numFrom0To1: number): number => Math.round(numFrom0To1 * 256);
 
 export const darkenColor = (colorString: string) => {
   const color = new Color(colorString);

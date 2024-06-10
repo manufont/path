@@ -49,7 +49,7 @@ export const rDeepSearch = (elt: object, lambda: (str: any) => any): object => {
         ...acc,
         [key]: rDeepSearch(value, lambda),
       }),
-      {}
+      {},
     );
   }
   return lambda(elt);

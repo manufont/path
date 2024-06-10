@@ -6,7 +6,7 @@ import useDidUpdateEffect from "./useDidUpdateEffect";
 export default function useBufferedState<T>(
   value: T,
   setter: (newValue: T) => void,
-  delay: number
+  delay: number,
 ) {
   const [instantValue, setInstantValue] = useState<T>(value);
 

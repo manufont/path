@@ -16,15 +16,18 @@ type Fetcher = (url: string) => Promise<any>;
 
 type Parser<T> = (response: Response) => T;
 
-const isFetched = (url: string | null, entry: Response | Promise<Response> | undefined): entry is Response => {
+const isFetched = (
+  url: string | null,
+  entry: Response | Promise<Response> | undefined,
+): entry is Response => {
   if (url === null) return false;
-  return Boolean(promiseCache[url] && !(promiseCache[url] instanceof Promise))
-}
+  return Boolean(promiseCache[url] && !(promiseCache[url] instanceof Promise));
+};
 
 const useResource = <T>(
   url: string | null,
   parseResult: Parser<T> = noop,
-  fetcher: Fetcher = defaultFetcher
+  fetcher: Fetcher = defaultFetcher,
 ): [resource: T | null, loading: boolean, error: unknown] => {
   const fetched = isFetched(url, url ? promiseCache[url] : undefined);
   const [error, setError] = useState<unknown | null>(null);

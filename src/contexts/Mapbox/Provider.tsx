@@ -27,7 +27,7 @@ export const MapboxProvider = ({ children }: React.PropsWithChildren) => {
         map.resize();
       }
     },
-    [map, mapState]
+    [map, mapState],
   );
 
   useEffect(() => {

@@ -2,10 +2,10 @@ import { MapboxOptions } from "mapbox-gl";
 import { useCallback, useContext } from "react";
 import MapboxContext from "./context";
 
-
-type MapProps = React.HTMLAttributes<HTMLDivElement> & React.PropsWithChildren<{
-  options: Omit<MapboxOptions, "container">;
-}>
+type MapProps = React.HTMLAttributes<HTMLDivElement> &
+  React.PropsWithChildren<{
+    options: Omit<MapboxOptions, "container">;
+  }>;
 
 const Map = ({ children, options, ...containerProps }: MapProps) => {
   const { map, registerMap } = useContext(MapboxContext);

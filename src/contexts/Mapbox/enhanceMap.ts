@@ -19,7 +19,7 @@ const enhanceMap = (originalMap: mapboxgl.Map) => {
     layerId: string,
     onDragMove: DragEventListener<T>,
     onDragEnd: DragEventListener<T>,
-    onClick?: DragEventListener<T>
+    onClick?: DragEventListener<T>,
   ) => {
     let feature: T | null = null;
     let point: Point | null = null;

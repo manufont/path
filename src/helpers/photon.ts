@@ -23,7 +23,7 @@ export type PhotonFeature = {
   };
   geometry: {
     coordinates: LonLat;
-  }
+  };
 };
 
 export const photonToIcon = (photon: PhotonFeature): any => {

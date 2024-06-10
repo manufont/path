@@ -25,9 +25,14 @@ type SearchBoxProps = {
   onPlaceSelect: (place: PhotonFeature) => void;
   defaultSearchText: string;
   setLocation: (location: LonLat | null) => void;
-}
+};
 
-const SearchBox = ({ mapCenter, onPlaceSelect, defaultSearchText, setLocation }: SearchBoxProps) => {
+const SearchBox = ({
+  mapCenter,
+  onPlaceSelect,
+  defaultSearchText,
+  setLocation,
+}: SearchBoxProps) => {
   const [searchUrl, setSearchUrl] = useState<string | null>(null);
   const [hideGeolocation, setHideGeolocation] = useState(!navigator.geolocation);
   const [photons, loading, error] = useResource<PhotonFeature[]>(searchUrl, parsePhotonResults);
@@ -61,7 +66,7 @@ const SearchBox = ({ mapCenter, onPlaceSelect, defaultSearchText, setLocation }:
         const { latitude, longitude } = position.coords;
         setLocation([longitude, latitude]);
       },
-      (error) => setHideGeolocation(true)
+      (error) => setHideGeolocation(true),
     );
   };
 
@@ -88,7 +93,7 @@ const SearchBox = ({ mapCenter, onPlaceSelect, defaultSearchText, setLocation }:
         setSearchText(photonToString(value as PhotonFeature));
         onPlaceSelect(value as PhotonFeature);
       }}
-      value={{ properties: { type: "label", name: searchText }} as PhotonFeature}
+      value={{ properties: { type: "label", name: searchText } } as PhotonFeature}
       noOptionsText="No result found."
       loading={loading}
       renderInput={(params) => (
