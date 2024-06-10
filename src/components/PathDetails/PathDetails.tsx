@@ -30,6 +30,7 @@ import { useBufferedState } from "hooks";
 import { Path } from "hooks/usePath";
 
 import styles from "./PathDetails.module.css";
+import OptionSlider from "./OptionSlider";
 
 const share = () => {
   navigator.share({
@@ -87,7 +88,7 @@ const PathDetails = ({
   const [instantAvoidBadSurfaces, setInstantAvoidBadSurfaces] = useBufferedState(
     avoidBadSurfaces,
     setAvoidBadSurfaces,
-    200,
+    200
   );
   const [snackbarOpen, setSnackbarOpen] = useState(false);
 
@@ -218,9 +219,7 @@ const PathDetails = ({
               <ExpandLessIcon />
             </IconButton>
           </div>
-          <Typography id="continuous-slider" gutterBottom>
-            Speed
-          </Typography>
+          <Typography className={styles.title}>Speed</Typography>
           <div className={styles.speedContainer}>
             <Slider
               value={instantSpeed}
@@ -248,39 +247,21 @@ const PathDetails = ({
         </div>
         {mode === "cycling" && (
           <>
-            <div>
-              <Typography gutterBottom>Use roads</Typography>
-              <div className={styles.sliderContainer}>
-                <Slider
-                  value={instantUseRoads}
-                  onChange={(e, value) => setInstantUseRoads(Number(value))}
-                  marks={[
-                    { value: 0, label: "No" },
-                    { value: 0.5, label: "Maybe" },
-                    { value: 1, label: "Yes" },
-                  ]}
-                  min={0}
-                  max={1}
-                  step={0.1}
-                ></Slider>
-              </div>
+            <div className={styles.optionSlider}>
+              <Typography className={styles.title}>Use roads</Typography>
+              <OptionSlider
+                value={instantUseRoads}
+                onValueChange={setInstantUseRoads}
+                labels={["More paths", "More roads"]}
+              />
             </div>
-            <div>
-              <Typography gutterBottom>Avoid bad surfaces</Typography>
-              <div className={styles.sliderContainer}>
-                <Slider
-                  value={instantAvoidBadSurfaces}
-                  onChange={(e, value) => setInstantAvoidBadSurfaces(Number(value))}
-                  marks={[
-                    { value: 0, label: "No" },
-                    { value: 0.5, label: "Maybe" },
-                    { value: 1, label: "Yes" },
-                  ]}
-                  min={0}
-                  max={1}
-                  step={0.125}
-                ></Slider>
-              </div>
+            <div className={styles.optionSlider}>
+              <Typography className={styles.title}>Avoid bad surfaces</Typography>
+              <OptionSlider
+                value={instantAvoidBadSurfaces}
+                onValueChange={setInstantAvoidBadSurfaces}
+                labels={["No", "Yes"]}
+              />
             </div>
           </>
         )}

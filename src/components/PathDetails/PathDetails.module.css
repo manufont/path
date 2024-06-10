@@ -28,7 +28,17 @@
 }
 
 .sliderContainer {
-  margin: 0 8px;
+  margin: 0px 8px;
+}
+
+.sliderLabels {
+  display: flex;
+  justify-content: space-between;
+  margin: -10px -8px 0 -8px;
+}
+
+.optionSlider:not(:last-child) {
+  margin-bottom: 12px;
 }
 
 .root .accordionExpanded {
