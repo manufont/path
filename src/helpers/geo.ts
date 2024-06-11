@@ -1,6 +1,6 @@
 import polyline from "@mapbox/polyline";
 
-import { minBy, avg, first } from "./methods";
+import { minBy, avg, last } from "./methods";
 import { Path } from "hooks/usePath";
 
 const PATH_PRECISION = Number(process.env.REACT_APP_PATH_PRECISION);
@@ -113,4 +113,10 @@ export const pathEncoder: Encoder<LonLat[]> = {
 };
 
 export const getWaypointsFromPath = (path: Path) =>
-  pDecode(pEncode(path.trip.legs.map((leg) => first(leg.decodedShape)).slice(1)));
+  pDecode(
+    pEncode(
+      path.trip.legs
+        .map((leg) => last(leg.decodedShape))
+        .slice(0, path.trip.oneWayMode ? undefined : -1)
+    )
+  );

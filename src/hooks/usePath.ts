@@ -2,7 +2,8 @@ import { useMemo } from "react";
 import polyline from "@mapbox/polyline";
 
 import useResource, { addCacheEntry } from "./useResource";
-import { LonLat, getWaypointsFromPath } from "helpers/geo";
+import { LonLat, getWaypointsFromPath, lonLatCmp } from "helpers/geo";
+import { first, last } from "helpers/methods";
 
 const VALHALLA_URL = process.env.REACT_APP_VALHALLA_URL;
 
@@ -28,6 +29,7 @@ export type Path = {
       shape: string;
       decodedShape: LonLat[];
     }[];
+    oneWayMode: boolean;
   };
 };
 
@@ -36,28 +38,42 @@ export type PathOptions = {
   mode: "running" | "cycling";
   useRoads: number;
   avoidBadSurfaces: number;
+  oneWayMode: boolean;
+};
+
+const isOneWay = (legs: Path["trip"]["legs"]) => {
+  const start = first(first(legs).decodedShape);
+  const end = last(last(legs).decodedShape);
+  return !lonLatCmp(start, end);
 };
 
 const parsePathResults = (results: ValhallaResponse): Path | null => {
   if (!results.trip) return null;
+
+  const legs = results.trip.legs.map((leg) => ({
+    ...leg,
+    decodedShape: polyline.decode(leg.shape, 6).map(([lat, lng]) => [lng, lat] as LonLat),
+  }));
   return {
     ...results,
     trip: {
       ...results.trip,
-      legs: results.trip.legs.map((leg) => ({
-        ...leg,
-        decodedShape: polyline.decode(leg.shape, 6).map(([lat, lng]) => [lng, lat]),
-      })),
+      legs,
+      oneWayMode: isOneWay(legs),
     },
   };
 };
 
 const getPathUrl = (startPoint: LonLat | null, waypoints: LonLat[], options: PathOptions) => {
   if (waypoints.length === 0 || startPoint === null) return null;
-  const { speed, mode, useRoads, avoidBadSurfaces } = options;
+  const { speed, mode, useRoads, avoidBadSurfaces, oneWayMode } = options;
+  const allPoints = [startPoint, ...waypoints];
+  if (!oneWayMode) {
+    allPoints.push(startPoint);
+  }
   const params = {
     costing: mode === "running" ? "pedestrian" : "bicycle",
-    locations: [startPoint, ...waypoints, startPoint].map((point) => ({
+    locations: allPoints.map((point) => ({
       lon: point[0],
       lat: point[1],
       options: { allowUTurn: true },

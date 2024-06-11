@@ -116,7 +116,7 @@ const MapWaypoints = ({ waypoints, setWaypoints }: MapWaypointsProps) => {
     const onClick: DragEventListener<WaypointFeature> = (e, waypoint) => {
       setWaypoints(
         waypoints.filter((_, index) => index !== waypoint.id),
-        true,
+        true
       );
     };
 
@@ -204,16 +204,18 @@ const MapPolyline = ({ path, setHoveredFeature }: MapPolylineProps) => {
     if (!path || !map) return;
     const sourceData = {
       type: "FeatureCollection" as const,
-      features: path.trip.legs.slice(0, -1).map((leg, index) => ({
-        type: "Feature" as const,
-        geometry: {
-          type: "LineString" as const,
-          coordinates: leg.decodedShape,
-        },
-        properties: {
-          id: index,
-        },
-      })),
+      features: path.trip.legs
+        .slice(0, path.trip.oneWayMode ? undefined : -1)
+        .map((leg, index) => ({
+          type: "Feature" as const,
+          geometry: {
+            type: "LineString" as const,
+            coordinates: leg.decodedShape,
+          },
+          properties: {
+            id: index,
+          },
+        })),
     };
 
     map.addOrUpdateSource("polyline", {
@@ -235,17 +237,17 @@ const MapPolyline = ({ path, setHoveredFeature }: MapPolylineProps) => {
             "line-width": 40,
           },
         },
-        "waypoints-layer",
+        "waypoints-layer"
       );
 
       const onMouseMove = (e: DragEvent) => {
         e.originalEvent.stopPropagation();
         const features = map.queryRenderedFeatures(e.point);
         const feature = features.find(
-          (_) => _.layer.id === "polyline-box-layer",
+          (_) => _.layer.id === "polyline-box-layer"
         ) as unknown as GeoJSON.Feature<GeoJSON.LineString, { id: number }>;
         const onWaypoints = features.find((_) =>
-          ["waypoints-layer", "location-layer"].includes(_.layer.id),
+          ["waypoints-layer", "location-layer"].includes(_.layer.id)
         );
         if (onWaypoints) {
           setHoveredFeature(null);
@@ -294,7 +296,7 @@ const MapPolyline = ({ path, setHoveredFeature }: MapPolylineProps) => {
           "line-width": 8,
         },
       },
-      "waypoints-layer",
+      "waypoints-layer"
     );
     map.addLayerIfNotExist(
       {
@@ -310,7 +312,7 @@ const MapPolyline = ({ path, setHoveredFeature }: MapPolylineProps) => {
           "line-width": 5,
         },
       },
-      "location-layer",
+      "location-layer"
     );
   }, [map, path, setHoveredFeature]);
 
@@ -321,7 +323,7 @@ const MapPolyline = ({ path, setHoveredFeature }: MapPolylineProps) => {
       properties: {},
       geometry: {
         type: "LineString" as const,
-        coordinates: last(path.trip.legs).decodedShape,
+        coordinates: path.trip.oneWayMode ? [] : last(path.trip.legs).decodedShape,
       },
     };
 
@@ -350,7 +352,7 @@ const MapPolyline = ({ path, setHoveredFeature }: MapPolylineProps) => {
           "line-width": 8,
         },
       },
-      "waypoints-layer",
+      "waypoints-layer"
     );
     map.addLayerIfNotExist(
       {
@@ -367,7 +369,7 @@ const MapPolyline = ({ path, setHoveredFeature }: MapPolylineProps) => {
           "line-width": 5,
         },
       },
-      "polyline-layer",
+      "polyline-layer"
     );
   }, [map, path]);
 
@@ -435,7 +437,7 @@ const MapPath = ({ location, setLocation, waypoints, setWaypoints, path }: MapPa
       setWaypoints(newWaypoints, true);
       setHoveredFeature(null);
     },
-    [hoveredFeature, setWaypoints, waypoints],
+    [hoveredFeature, setWaypoints, waypoints]
   );
 
   if (!location) return null;

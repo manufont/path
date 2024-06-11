@@ -7,6 +7,8 @@ import IconButton from "@material-ui/core/IconButton";
 import UndoIcon from "@material-ui/icons/Undo";
 import DirectionsRunIcon from "@material-ui/icons/DirectionsRun";
 import DirectionsBikeIcon from "@material-ui/icons/DirectionsBike";
+import SyncAltIcon from "@material-ui/icons/SyncAlt";
+import TrendingFlatIcon from "@material-ui/icons/TrendingFlat";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import { useTheme } from "@material-ui/core/styles";
@@ -36,6 +38,8 @@ import { darkenColor } from "helpers/color";
 import { Path } from "hooks/usePath";
 import BoundsMapping from "./BoundsMapping";
 import { Style } from "mapbox-gl";
+import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup";
+import ToggleButton from "@material-ui/lab/ToggleButton";
 
 const DEFAULT_USE_ROADS = 0.5;
 const DEFAULT_AVOID_BAD_SURFACES = 0.25;
@@ -45,6 +49,11 @@ const DEFAULT_CYCLING_SPEED = 25;
 const numberEncoder: Encoder<number> = {
   encode: (nb) => String(nb),
   decode: (str) => parseFloat(str),
+};
+
+const booleanEncoder: Encoder<boolean> = {
+  encode: (bool) => (bool ? "1" : undefined),
+  decode: (str) => Boolean(str),
 };
 
 const defaultPath: LonLat[] = [];
@@ -86,6 +95,7 @@ const mapboxDarkStyle = rDeepSearch(mapboxLightStyle, (value) => {
 }) as Style;
 
 const Map = () => {
+  const [oneWayMode, setOneWayMode] = useSearchState("o", false, booleanEncoder);
   const [location, setLocation] = useSearchState("l", null, lonLatEncoder);
   const [waypoints, setWaypoints] = useSearchState("p", defaultPath, pathEncoder);
   const [locationText, setLocationText] = useSearchState("q", "");
@@ -96,7 +106,7 @@ const Map = () => {
   const [avoidBadSurfaces, setAvoidBadSurfaces] = useSearchState(
     "abs",
     DEFAULT_AVOID_BAD_SURFACES,
-    numberEncoder,
+    numberEncoder
   );
   const pathOptions = useMemo(
     () => ({
@@ -104,8 +114,9 @@ const Map = () => {
       speed,
       useRoads,
       avoidBadSurfaces,
+      oneWayMode,
     }),
-    [mode, speed, useRoads, avoidBadSurfaces],
+    [mode, speed, useRoads, avoidBadSurfaces, oneWayMode]
   );
   const [path, pathLoading, pathError] = usePath(location, waypoints, pathOptions);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -144,7 +155,7 @@ const Map = () => {
       bounds,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [theme],
+    [theme]
   );
 
   const clearPath = () => {
@@ -199,10 +210,33 @@ const Map = () => {
         </Card>
         {location && (
           <Card className={styles.expandableBox}>
-            <Tabs value={mode} onChange={(e, _) => setMode(_, true)} centered textColor="primary">
-              <Tab wrapped icon={<DirectionsRunIcon />} value="running" />
-              <Tab wrapped icon={<DirectionsBikeIcon />} value="cycling" />
-            </Tabs>
+            <div className={styles.header}>
+              <Tabs
+                value={mode}
+                onChange={(e, _) => setMode(_, true)}
+                centered
+                textColor="primary"
+                variant="standard"
+              >
+                <Tab wrapped icon={<DirectionsRunIcon />} value="running" />
+                <Tab wrapped icon={<DirectionsBikeIcon />} value="cycling" />
+              </Tabs>
+              <ToggleButtonGroup
+                color="primary"
+                size="small"
+                value={oneWayMode ? "one-way" : "loop"}
+                exclusive
+                onChange={(e, value) => setOneWayMode(value === "one-way")}
+                aria-label="Platform"
+              >
+                <ToggleButton value="loop">
+                  <SyncAltIcon />
+                </ToggleButton>
+                <ToggleButton value="one-way">
+                  <TrendingFlatIcon />
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </div>
             <PathDetails
               mode={mode}
               path={path}
