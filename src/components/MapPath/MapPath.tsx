@@ -115,7 +115,7 @@ const MapWaypoints = ({ waypoints, setWaypoints }: MapWaypointsProps) => {
 
     const onClick: DragEventListener<WaypointFeature> = (e, waypoint) => {
       setWaypoints(
-        waypoints.filter((_, index) => index !== waypoint.id),
+        waypoints.filter((_, index) => index !== waypoint.properties.id),
         true
       );
     };
