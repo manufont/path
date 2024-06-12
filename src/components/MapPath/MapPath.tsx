@@ -300,6 +300,25 @@ const MapPolyline = ({ path, setHoveredFeature }: MapPolylineProps) => {
     );
     map.addLayerIfNotExist(
       {
+        id: "polyline-symbol",
+        source: "polyline",
+        type: "symbol",
+        layout: {
+          "symbol-placement": "line",
+          "symbol-spacing": 120,
+          "text-font": ["Noto Sans Regular"],
+          "text-field": ">",
+          "text-size": 24,
+          "text-keep-upright": false,
+        },
+        paint: {
+          "text-color": "white",
+        },
+      },
+      "location-layer"
+    );
+    map.addLayerIfNotExist(
+      {
         id: "polyline-layer",
         source: "polyline",
         type: "line",
@@ -312,7 +331,7 @@ const MapPolyline = ({ path, setHoveredFeature }: MapPolylineProps) => {
           "line-width": 5,
         },
       },
-      "location-layer"
+      "polyline-symbol"
     );
   }, [map, path, setHoveredFeature]);
 
@@ -379,6 +398,7 @@ const MapPolyline = ({ path, setHoveredFeature }: MapPolylineProps) => {
       map.removeLayerIfExist("polyline-background-layer");
       map.removeLayerIfExist("polyline-box-layer");
       map.removeLayerIfExist("polyline-layer");
+      map.removeLayerIfExist("polyline-symbol");
       map.removeLayerIfExist("return-polyline-background-layer");
       map.removeLayerIfExist("return-polyline-layer");
       map.removeSourceIfExist("polyline");
