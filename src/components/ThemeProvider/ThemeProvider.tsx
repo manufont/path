@@ -30,27 +30,15 @@ export const ThemeProvider = ({ children }: PropsWithChildren) => {
       setTheme(e.matches ? darkTheme : lightTheme);
     };
     try {
-      // Chrome & Firefox
       prefersDark.addEventListener("change", onPrefersDarkChange);
-    } catch (e1) {
-      try {
-        // Safari
-        prefersDark.addListener(onPrefersDarkChange);
-      } catch (e2) {
-        console.error(e2);
-      }
+    } catch (e) {
+      console.error(e);
     }
     return () => {
       try {
-        // Chrome & Firefox
         prefersDark.removeEventListener("change", onPrefersDarkChange);
-      } catch (e1) {
-        try {
-          // Safari
-          prefersDark.removeListener(onPrefersDarkChange);
-        } catch (e2) {
-          console.error(e2);
-        }
+      } catch (e) {
+        console.error(e);
       }
     };
   }, [setTheme]);
