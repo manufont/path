@@ -1,27 +1,27 @@
 import { useState } from "react";
-import Divider from "@material-ui/core/Divider";
-import Accordion from "@material-ui/core/Accordion";
-import AccordionDetails from "@material-ui/core/AccordionDetails";
-import AccordionSummary from "@material-ui/core/AccordionSummary";
-import InputAdornment from "@material-ui/core/InputAdornment";
-import Snackbar from "@material-ui/core/Snackbar";
-import Typography from "@material-ui/core/Typography";
-import IconButton from "@material-ui/core/IconButton";
-import LinearProgress from "@material-ui/core/LinearProgress";
-import SettingsIcon from "@material-ui/icons/Settings";
-import ShareIcon from "@material-ui/icons/Share";
-import ClearIcon from "@material-ui/icons/Clear";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
-import ExpandLessIcon from "@material-ui/icons/ExpandLess";
-import FileCopyIcon from "@material-ui/icons/FileCopy";
-import GetAppIcon from "@material-ui/icons/GetApp";
-import Slider from "@material-ui/core/Slider";
-import Input from "@material-ui/core/Input";
-import MuiAlert from "@material-ui/lab/Alert";
-import Menu from "@material-ui/core/Menu";
-import MenuItem from "@material-ui/core/MenuItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
+import Divider from "@mui/material/Divider";
+import Accordion from "@mui/material/Accordion";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import InputAdornment from "@mui/material/InputAdornment";
+import Snackbar from "@mui/material/Snackbar";
+import Typography from "@mui/material/Typography";
+import IconButton from "@mui/material/IconButton";
+import LinearProgress from "@mui/material/LinearProgress";
+import SettingsIcon from "@mui/icons-material/Settings";
+import ShareIcon from "@mui/icons-material/Share";
+import ClearIcon from "@mui/icons-material/Clear";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import FileCopyIcon from "@mui/icons-material/FileCopy";
+import GetAppIcon from "@mui/icons-material/GetApp";
+import Slider from "@mui/material/Slider";
+import Input from "@mui/material/Input";
+import MuiAlert from "@mui/material/Alert";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
 import copy from "clipboard-copy";
 
 import { formatDuration } from "helpers/date";
@@ -118,7 +118,7 @@ const PathDetails = ({
     closeMenu();
   };
 
-  const closeSnackbar = (e?: React.SyntheticEvent) => {
+  const closeSnackbar = (e?: React.SyntheticEvent | Event) => {
     e && e.stopPropagation();
     setSnackbarOpen(false);
   };

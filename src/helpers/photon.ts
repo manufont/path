@@ -1,6 +1,6 @@
-import HomeIcon from "@material-ui/icons/Home";
-import PublicIcon from "@material-ui/icons/Public";
-import LocationCityIcon from "@material-ui/icons/LocationCity";
+import HomeIcon from "@mui/icons-material/Home";
+import PublicIcon from "@mui/icons-material/Public";
+import LocationCityIcon from "@mui/icons-material/LocationCity";
 import RoadIcon from "mdi-material-ui/Road";
 import queryString from "query-string";
 import { LonLat } from "./geo";

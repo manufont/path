@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useMemo } from "react";
-import Autocomplete from "@material-ui/lab/Autocomplete";
-import TextField from "@material-ui/core/TextField";
-import Divider from "@material-ui/core/Divider";
-import IconButton from "@material-ui/core/IconButton";
-import InputAdornment from "@material-ui/core/InputAdornment";
-import ClearIcon from "@material-ui/icons/Clear";
-import GpsFixedIcon from "@material-ui/icons/GpsFixed";
+import Autocomplete from "@mui/material/Autocomplete";
+import TextField from "@mui/material/TextField";
+import Divider from "@mui/material/Divider";
+import IconButton from "@mui/material/IconButton";
+import InputAdornment from "@mui/material/InputAdornment";
+import ClearIcon from "@mui/icons-material/Clear";
+import GpsFixedIcon from "@mui/icons-material/GpsFixed";
 import queryString from "query-string";
 import cn from "classnames";
 
@@ -66,7 +66,7 @@ const SearchBox = ({
         const { latitude, longitude } = position.coords;
         setLocation([longitude, latitude]);
       },
-      (error) => setHideGeolocation(true),
+      (error) => setHideGeolocation(true)
     );
   };
 
@@ -79,13 +79,13 @@ const SearchBox = ({
     <Autocomplete
       freeSolo
       options={photons || []}
-      getOptionLabel={photonToString}
-      renderOption={(option) => {
+      getOptionLabel={(option) => (typeof option === "string" ? option : photonToString(option))}
+      renderOption={(props, option) => {
         const Icon = photonToIcon(option);
         return (
-          <span>
+          <li {...props}>
             <Icon className={styles.icon} /> {photonToString(option)}
-          </span>
+          </li>
         );
       }}
       onInput={(e) => setSearchText((e.target as HTMLInputElement).value)}

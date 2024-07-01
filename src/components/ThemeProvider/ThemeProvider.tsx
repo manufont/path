@@ -1,9 +1,9 @@
 import React, { PropsWithChildren, useEffect, useState } from "react";
-import { ThemeProvider as MuiThemeProvider } from "@material-ui/core";
-import { createTheme } from "@material-ui/core/styles";
-import green from "@material-ui/core/colors/green";
-import blueGrey from "@material-ui/core/colors/blueGrey";
-import CssBaseline from "@material-ui/core/CssBaseline";
+import { ThemeProvider as MuiThemeProvider } from "@mui/material";
+import { createTheme } from "@mui/material/styles";
+import green from "@mui/material/colors/green";
+import blueGrey from "@mui/material/colors/blueGrey";
+import CssBaseline from "@mui/material/CssBaseline";
 
 const lightTheme = createTheme({
   palette: {
@@ -14,7 +14,7 @@ const lightTheme = createTheme({
 
 const darkTheme = createTheme({
   palette: {
-    type: "dark",
+    mode: "dark",
     primary: green,
     secondary: blueGrey,
   },

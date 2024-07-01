@@ -1,5 +1,5 @@
 import { BrowserRouter } from "react-router-dom";
-import { StylesProvider } from "@material-ui/core/styles";
+import { StylesProvider } from "@mui/styles";
 
 import { Layout, ThemeProvider } from "components";
 

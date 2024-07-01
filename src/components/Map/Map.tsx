@@ -1,17 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
-import Alert from "@material-ui/lab/Alert";
-import Snackbar from "@material-ui/core/Snackbar";
-import Card from "@material-ui/core/Card";
-import CardContent from "@material-ui/core/CardContent";
-import IconButton from "@material-ui/core/IconButton";
-import UndoIcon from "@material-ui/icons/Undo";
-import DirectionsRunIcon from "@material-ui/icons/DirectionsRun";
-import DirectionsBikeIcon from "@material-ui/icons/DirectionsBike";
-import SyncAltIcon from "@material-ui/icons/SyncAlt";
-import TrendingFlatIcon from "@material-ui/icons/TrendingFlat";
-import Tabs from "@material-ui/core/Tabs";
-import Tab from "@material-ui/core/Tab";
-import { useTheme } from "@material-ui/core/styles";
+import Alert from "@mui/material/Alert";
+import Snackbar from "@mui/material/Snackbar";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import IconButton from "@mui/material/IconButton";
+import UndoIcon from "@mui/icons-material/Undo";
+import DirectionsRunIcon from "@mui/icons-material/DirectionsRun";
+import DirectionsBikeIcon from "@mui/icons-material/DirectionsBike";
+import SyncAltIcon from "@mui/icons-material/SyncAlt";
+import TrendingFlatIcon from "@mui/icons-material/TrendingFlat";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import { useTheme } from "@mui/material/styles";
 
 import { SearchBox, MapPath, PathDetails } from "components";
 import { MapboxMap, MapboxProvider } from "contexts";
@@ -38,8 +38,8 @@ import { darkenColor } from "helpers/color";
 import { Path } from "hooks/usePath";
 import BoundsMapping from "./BoundsMapping";
 import { Style } from "mapbox-gl";
-import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup";
-import ToggleButton from "@material-ui/lab/ToggleButton";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+import ToggleButton from "@mui/material/ToggleButton";
 
 const DEFAULT_USE_ROADS = 0.5;
 const DEFAULT_AVOID_BAD_SURFACES = 0.25;
@@ -151,7 +151,7 @@ const Map = () => {
   const mapOptions = useMemo(
     () => ({
       width: "100%",
-      style: theme.palette.type === "dark" ? mapboxDarkStyle : mapboxLightStyle,
+      style: theme.palette.mode === "dark" ? mapboxDarkStyle : mapboxLightStyle,
       bounds,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
