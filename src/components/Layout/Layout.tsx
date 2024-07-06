@@ -1,16 +1,21 @@
 import React from "react";
+import styled from "@emotion/styled";
 
 import { Map } from "components";
-
-import styles from "./Layout.module.css";
 
 // general layout should go here
 const Layout = () => {
   return (
-    <div className={styles.root}>
+    <Root>
       <Map />
-    </div>
+    </Root>
   );
 };
+
+const Root = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+`;
 
 export default Layout;

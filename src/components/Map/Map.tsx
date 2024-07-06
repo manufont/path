@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import styled from "@emotion/styled";
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
 import Card from "@mui/material/Card";
@@ -32,7 +33,6 @@ import {
 import { photonToString, getPhotonFromLocation, PhotonFeature } from "helpers/photon";
 
 import mapboxLightStyle from "./mapboxStyle";
-import styles from "./Map.module.css";
 import { rDeepSearch } from "helpers/methods";
 import { darkenColor } from "helpers/color";
 import { Path } from "hooks/usePath";
@@ -196,21 +196,21 @@ const Map = () => {
   const [showSettings, setShowSettings] = useState(false);
 
   return (
-    <div className={styles.mapContainer}>
-      <div className={styles.boxes}>
+    <MapContainerDiv>
+      <BoxesDiv>
         <Card>
-          <CardContent className={styles.cardContent}>
+          <StyledCardContent>
             <SearchBox
               defaultSearchText={locationText}
               mapCenter={boundsCenter(bounds)}
               onPlaceSelect={onPlaceSelect}
               setLocation={onSearchBoxLocationChange}
             />
-          </CardContent>
+          </StyledCardContent>
         </Card>
         {location && (
-          <Card className={styles.expandableBox}>
-            <div className={styles.header}>
+          <ExpandableBox>
+            <HeaderDiv>
               <Tabs
                 value={mode}
                 onChange={(e, _) => setMode(_, true)}
@@ -236,7 +236,7 @@ const Map = () => {
                   <TrendingFlatIcon />
                 </ToggleButton>
               </ToggleButtonGroup>
-            </div>
+            </HeaderDiv>
             <PathDetails
               mode={mode}
               path={path}
@@ -251,7 +251,7 @@ const Map = () => {
               showSettings={showSettings}
               setShowSettings={setShowSettings}
             />
-          </Card>
+          </ExpandableBox>
         )}
 
         <Snackbar open={snackbarOpen}>
@@ -274,7 +274,7 @@ const Map = () => {
             Cannot build path
           </Alert>
         </Snackbar>
-      </div>
+      </BoxesDiv>
       <MapboxProvider>
         <MapboxMap options={mapOptions} style={{ flex: 1 }}>
           <BoundsMapping bounds={bounds} setBounds={setBounds} />
@@ -287,8 +287,60 @@ const Map = () => {
           />
         </MapboxMap>
       </MapboxProvider>
-    </div>
+    </MapContainerDiv>
   );
 };
+
+const MapContainerDiv = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+`;
+
+const StyledCardContent = styled(CardContent)`
+  padding: 0px 12px 0px 12px;
+  :last-child {
+    padding-bottom: 4px;
+  }
+`;
+
+const BoxesDiv = styled.div`
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  width: 360px;
+  z-index: 1;
+
+  @media screen and (max-width: 640px) {
+    position: initial;
+    width: 100%;
+    border-radius: unset;
+  }
+`;
+
+const ExpandableBox = styled(Card)`
+  margin-top: 16px;
+  height: 108px;
+  overflow: visible;
+
+  @media screen and (max-width: 640px) {
+    margin-top: -6px;
+  }
+`;
+
+const HeaderDiv = styled.div`
+  display: flex;
+  align-items: start;
+  margin: 0px 12px;
+  padding-top: 8px;
+
+  > *:first-of-type {
+    flex: 1;
+  }
+  @media screen and (max-width: 640px) {
+    padding-top: 0px;
+  }
+`;
 
 export default Map;

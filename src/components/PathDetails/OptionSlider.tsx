@@ -1,6 +1,5 @@
+import styled from "@emotion/styled";
 import { Slider, Typography } from "@mui/material";
-
-import styles from "./PathDetails.module.css";
 
 type OptionSliderProps = {
   labels: string[];
@@ -10,7 +9,7 @@ type OptionSliderProps = {
 
 const OptionSlider = ({ labels, value, onValueChange }: OptionSliderProps) => {
   return (
-    <div className={styles.sliderContainer}>
+    <SliderContainerDiv>
       <Slider
         value={value}
         onChange={(e, value) => onValueChange(Number(value))}
@@ -19,7 +18,7 @@ const OptionSlider = ({ labels, value, onValueChange }: OptionSliderProps) => {
         max={1}
         step={0.1}
       ></Slider>
-      <div className={styles.sliderLabels}>
+      <SliderLabelsDiv>
         {labels.map((label, index) => (
           <Typography
             key={index}
@@ -31,9 +30,19 @@ const OptionSlider = ({ labels, value, onValueChange }: OptionSliderProps) => {
             {label}
           </Typography>
         ))}
-      </div>
-    </div>
+      </SliderLabelsDiv>
+    </SliderContainerDiv>
   );
 };
+
+const SliderContainerDiv = styled.div`
+  margin: 0px 8px;
+`;
+
+const SliderLabelsDiv = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin: -12px -8px 0 -8px;
+`;
 
 export default OptionSlider;

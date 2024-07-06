@@ -1,4 +1,5 @@
 import { useState } from "react";
+import styled from "@emotion/styled";
 import Divider from "@mui/material/Divider";
 import Accordion from "@mui/material/Accordion";
 import AccordionDetails from "@mui/material/AccordionDetails";
@@ -29,8 +30,8 @@ import { downloadGPX } from "helpers/gpx";
 import { useBufferedState } from "hooks";
 import { Path } from "hooks/usePath";
 
-import styles from "./PathDetails.module.css";
 import OptionSlider from "./OptionSlider";
+import { ClassNames } from "@emotion/react";
 
 const share = () => {
   navigator.share({
@@ -39,11 +40,11 @@ const share = () => {
   });
 };
 
-type PathDescriptionProps = {
+type PathDescriptionTextProps = {
   path: Path;
 };
 
-const PathDescription = ({ path }: PathDescriptionProps) => {
+const PathDescriptionText = ({ path }: PathDescriptionTextProps) => {
   const { summary } = path.trip;
   const { length, time } = summary;
   return (
@@ -137,136 +138,192 @@ const PathDetails = ({
   };
 
   return (
-    <Accordion
-      className={styles.root}
-      expanded={showSettings}
-      onChange={(e, isExpanded) => setShowSettings(isExpanded)}
-    >
-      <AccordionSummary
-        classes={{
-          root: styles.accordionRoot,
-          content: styles.accordionContent,
-          expanded: styles.accordionExpanded,
-        }}
-      >
-        <div className={styles.summary}>
-          {path ? (
-            <>
-              <Typography variant="h6" className={styles.pathDescription}>
-                <PathDescription path={path} />
-              </Typography>
-              <IconButton className={styles.shareButton} onClick={onClear}>
+    <ClassNames>
+      {({ css }) => (
+        <Accordion
+          expanded={showSettings}
+          onChange={(e, isExpanded) => setShowSettings(isExpanded)}
+        >
+          <AccordionSummary
+            classes={{
+              root: css`
+                padding-right: 4px;
+              `,
+              content: css`
+                margin: 6px 0;
+              `,
+              expanded: css`
+                margin-top: 0 !important;
+                margin-bottom: 0 !important;
+              `,
+            }}
+          >
+            <SummaryDiv>
+              {path ? (
+                <>
+                  <PathDescription variant="h6">
+                    <PathDescriptionText path={path} />
+                  </PathDescription>
+                  <IconButton onClick={onClear}>
+                    <ClearIcon />
+                  </IconButton>
+                  <IconButton onClick={onMenuButtonClick}>
+                    <MoreVertIcon />
+                  </IconButton>
+                </>
+              ) : pathLoading ? (
+                <StyledLinearProgress />
+              ) : (
+                <Typography>Click on the map to start mapping your path</Typography>
+              )}
+            </SummaryDiv>
+          </AccordionSummary>
+          <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={closeMenu}>
+            {Boolean(navigator.share) && (
+              <MenuItem onClick={onShareClick}>
+                <ListItemIcon>
+                  <ShareIcon />
+                </ListItemIcon>
+                <ListItemText>Share</ListItemText>
+              </MenuItem>
+            )}
+            <MenuItem onClick={onCopyLinkClick}>
+              <ListItemIcon>
+                <FileCopyIcon />
+              </ListItemIcon>
+              <ListItemText>Copy link</ListItemText>
+            </MenuItem>
+            <MenuItem onClick={onDownloadGPXClick}>
+              <ListItemIcon>
+                <GetAppIcon />
+              </ListItemIcon>
+              <ListItemText>Export GPX</ListItemText>
+            </MenuItem>
+            <MenuItem onClick={onSettingsClick}>
+              <ListItemIcon>
+                <SettingsIcon />
+              </ListItemIcon>
+              <ListItemText>{showSettings ? "Hide" : "Show"} settings</ListItemText>
+            </MenuItem>
+            <MenuItem onClick={onClear}>
+              <ListItemIcon>
                 <ClearIcon />
-              </IconButton>
-              <IconButton className={styles.shareButton} onClick={onMenuButtonClick}>
-                <MoreVertIcon />
-              </IconButton>
-            </>
-          ) : pathLoading ? (
-            <LinearProgress className={styles.progress} />
-          ) : (
-            <Typography>Click on the map to start mapping your path</Typography>
-          )}
-        </div>
-      </AccordionSummary>
-      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={closeMenu}>
-        {Boolean(navigator.share) && (
-          <MenuItem onClick={onShareClick}>
-            <ListItemIcon>
-              <ShareIcon />
-            </ListItemIcon>
-            <ListItemText>Share</ListItemText>
-          </MenuItem>
-        )}
-        <MenuItem onClick={onCopyLinkClick}>
-          <ListItemIcon>
-            <FileCopyIcon />
-          </ListItemIcon>
-          <ListItemText>Copy link</ListItemText>
-        </MenuItem>
-        <MenuItem onClick={onDownloadGPXClick}>
-          <ListItemIcon>
-            <GetAppIcon />
-          </ListItemIcon>
-          <ListItemText>Export GPX</ListItemText>
-        </MenuItem>
-        <MenuItem onClick={onSettingsClick}>
-          <ListItemIcon>
-            <SettingsIcon />
-          </ListItemIcon>
-          <ListItemText>{showSettings ? "Hide" : "Show"} settings</ListItemText>
-        </MenuItem>
-        <MenuItem onClick={onClear}>
-          <ListItemIcon>
-            <ClearIcon />
-          </ListItemIcon>
-          <ListItemText>Clear</ListItemText>
-        </MenuItem>
-      </Menu>
-      <Snackbar open={snackbarOpen} autoHideDuration={2000} onClose={closeSnackbar}>
-        <MuiAlert variant="filled" onClose={closeSnackbar} severity="success">
-          URL copied to clipboard !
-        </MuiAlert>
-      </Snackbar>
-      <AccordionDetails className={styles.accordionDetails}>
-        <Divider />
-        <div>
-          <div className={styles.settingsTitle} onClick={() => setShowSettings(false)}>
-            <Typography variant="h6" color="textSecondary">
-              Path settings
-            </Typography>
-            <IconButton onClick={() => setShowSettings(false)}>
-              <ExpandLessIcon />
-            </IconButton>
-          </div>
-          <Typography className={styles.title}>Speed</Typography>
-          <div className={styles.speedContainer}>
-            <Slider
-              value={instantSpeed}
-              className={styles.speedSlider}
-              onChange={(e, value) => setInstantSpeed(Number(value))}
-              min={mode === "running" ? 4 : 12}
-              max={mode === "running" ? 25 : 45}
-              step={1}
-              aria-labelledby="input-slider"
-            />
-            <Input
-              value={instantSpeed}
-              margin="dense"
-              onChange={(e) => setInstantSpeed(Number(e.target.value))}
-              endAdornment={<InputAdornment position="end">Km/h</InputAdornment>}
-              inputProps={{
-                step: 1,
-                min: mode === "running" ? 4 : 12,
-                max: mode === "running" ? 25 : 45,
-                type: "number",
-                "aria-labelledby": "input-slider",
-              }}
-            />
-          </div>
-        </div>
-        {mode === "cycling" && (
-          <>
-            <div className={styles.optionSlider}>
-              <Typography className={styles.title}>Use roads</Typography>
-              <OptionSlider
-                value={instantUseRoads}
-                onValueChange={setInstantUseRoads}
-                labels={["More paths", "More roads"]}
-              />
+              </ListItemIcon>
+              <ListItemText>Clear</ListItemText>
+            </MenuItem>
+          </Menu>
+          <Snackbar open={snackbarOpen} autoHideDuration={2000} onClose={closeSnackbar}>
+            <MuiAlert variant="filled" onClose={closeSnackbar} severity="success">
+              URL copied to clipboard !
+            </MuiAlert>
+          </Snackbar>
+          <StyledAccordionDetails>
+            <Divider />
+            <div>
+              <SettingsTitleDiv onClick={() => setShowSettings(false)}>
+                <Typography variant="h6" color="textSecondary">
+                  Path settings
+                </Typography>
+                <IconButton onClick={() => setShowSettings(false)}>
+                  <ExpandLessIcon />
+                </IconButton>
+              </SettingsTitleDiv>
+              <Typography>Speed</Typography>
+              <SpeedContainerDiv>
+                <SpeedSlider
+                  value={instantSpeed}
+                  onChange={(e, value) => setInstantSpeed(Number(value))}
+                  min={mode === "running" ? 4 : 12}
+                  max={mode === "running" ? 25 : 45}
+                  step={1}
+                  aria-labelledby="input-slider"
+                />
+                <Input
+                  value={instantSpeed}
+                  margin="dense"
+                  onChange={(e) => setInstantSpeed(Number(e.target.value))}
+                  endAdornment={<InputAdornment position="end">Km/h</InputAdornment>}
+                  inputProps={{
+                    step: 1,
+                    min: mode === "running" ? 4 : 12,
+                    max: mode === "running" ? 25 : 45,
+                    type: "number",
+                    "aria-labelledby": "input-slider",
+                  }}
+                />
+              </SpeedContainerDiv>
             </div>
-            <div className={styles.optionSlider}>
-              <Typography className={styles.title}>Avoid bad surfaces</Typography>
-              <OptionSlider
-                value={instantAvoidBadSurfaces}
-                onValueChange={setInstantAvoidBadSurfaces}
-                labels={["No", "Yes"]}
-              />
-            </div>
-          </>
-        )}
-      </AccordionDetails>
-    </Accordion>
+            {mode === "cycling" && (
+              <>
+                <OptionSliderDiv>
+                  <Typography>Use roads</Typography>
+                  <OptionSlider
+                    value={instantUseRoads}
+                    onValueChange={setInstantUseRoads}
+                    labels={["More paths", "More roads"]}
+                  />
+                </OptionSliderDiv>
+                <OptionSliderDiv>
+                  <Typography>Avoid bad surfaces</Typography>
+                  <OptionSlider
+                    value={instantAvoidBadSurfaces}
+                    onValueChange={setInstantAvoidBadSurfaces}
+                    labels={["No", "Yes"]}
+                  />
+                </OptionSliderDiv>
+              </>
+            )}
+          </StyledAccordionDetails>
+        </Accordion>
+      )}
+    </ClassNames>
   );
 };
 export default PathDetails;
+
+const SummaryDiv = styled.div`
+  display: flex;
+  flex: 1;
+  align-items: center;
+  min-height: 48px;
+`;
+
+const SpeedContainerDiv = styled.div`
+  display: flex;
+  flex: 1;
+  align-items: center;
+  > * {
+    margin: 0 8px;
+  }
+`;
+
+const SpeedSlider = styled(Slider)`
+  flex: 1;
+`;
+
+const OptionSliderDiv = styled.div`
+  :not(:last-child) {
+    margin-bottom: 12px;
+  }
+`;
+
+const StyledAccordionDetails = styled(AccordionDetails)`
+  flex-direction: column;
+  padding-top: 0;
+`;
+
+const StyledLinearProgress = styled(LinearProgress)`
+  flex: 1;
+`;
+
+const PathDescription = styled(Typography)`
+  flex: 1;
+`;
+
+const SettingsTitleDiv = styled.div`
+  padding-left: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+`;

@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
+import styled from "@emotion/styled";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import Divider from "@mui/material/Divider";
@@ -13,8 +14,8 @@ import { bufferize } from "helpers/methods";
 import { PhotonFeature, PhotonResponse, photonToIcon, photonToString } from "helpers/photon";
 import { useResource, useDidUpdateEffect } from "hooks";
 
-import styles from "./SearchBox.module.css";
 import { LonLat } from "helpers/geo";
+import { ClassNames, css } from "@emotion/react";
 
 const PHOTON_URL = process.env.REACT_APP_PHOTON_URL;
 
@@ -84,7 +85,12 @@ const SearchBox = ({
         const Icon = photonToIcon(option);
         return (
           <li {...props}>
-            <Icon className={styles.icon} /> {photonToString(option)}
+            <Icon
+              css={css`
+                vertical-align: text-bottom;
+              `}
+            />{" "}
+            {photonToString(option)}
           </li>
         );
       }}
@@ -97,39 +103,50 @@ const SearchBox = ({
       noOptionsText="No result found."
       loading={loading}
       renderInput={(params) => (
-        <TextField
-          {...params}
-          InputProps={{
-            ...params.InputProps,
-            className: cn(params.InputProps.className, styles.input),
-            endAdornment: (
-              <InputAdornment position="end">
-                {searchText && (
-                  <>
-                    <IconButton onClick={onInputClear}>
-                      <ClearIcon />
-                    </IconButton>
-                    {!hideGeolocation && (
-                      <Divider orientation="vertical" className={styles.inputDivider} />
+        <ClassNames>
+          {({ css }) => (
+            <TextField
+              {...params}
+              InputProps={{
+                ...params.InputProps,
+                className: cn(
+                  params.InputProps.className,
+                  css`
+                    padding-right: 0 !important;
+                  `
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    {searchText && (
+                      <>
+                        <IconButton onClick={onInputClear}>
+                          <ClearIcon />
+                        </IconButton>
+                        {!hideGeolocation && <InputDivider orientation="vertical" />}
+                      </>
                     )}
-                  </>
-                )}
-                {!hideGeolocation && (
-                  <IconButton onClick={geolocalize}>
-                    <GpsFixedIcon />
-                  </IconButton>
-                )}
-              </InputAdornment>
-            ),
-          }}
-          error={error !== null}
-          label={error === null ? "Enter your starting point" : String(error)}
-          margin="normal"
-          variant="outlined"
-        />
+                    {!hideGeolocation && (
+                      <IconButton onClick={geolocalize}>
+                        <GpsFixedIcon />
+                      </IconButton>
+                    )}
+                  </InputAdornment>
+                ),
+              }}
+              error={error !== null}
+              label={error === null ? "Enter your starting point" : String(error)}
+              margin="normal"
+              variant="outlined"
+            />
+          )}
+        </ClassNames>
       )}
     />
   );
 };
+
+const InputDivider = styled(Divider)`
+  height: 40px;
+`;
 
 export default SearchBox;
