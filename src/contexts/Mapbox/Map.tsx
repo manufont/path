@@ -1,4 +1,4 @@
-import { MapboxOptions } from "mapbox-gl";
+import { MapboxOptions } from "maplibre-gl";
 import { useCallback, useContext } from "react";
 import MapboxContext from "./context";
 

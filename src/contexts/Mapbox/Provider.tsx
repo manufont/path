@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useEffect } from "react";
-import mapboxgl from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
+import maplibregl from "maplibre-gl";
+import "maplibre-gl/dist/maplibre-gl.css";
 import { EnhancedMap, MapState } from "./types";
 import MapboxContext from "./context";
 import enhanceMap from "./enhanceMap";
@@ -27,13 +27,13 @@ export const MapboxProvider = ({ children }: React.PropsWithChildren) => {
         map.resize();
       }
     },
-    [map, mapState],
+    [map, mapState]
   );
 
   useEffect(() => {
     if (mapState === null) return;
     const { container, options } = mapState;
-    const mapboxMap = new mapboxgl.Map({
+    const mapboxMap = new maplibregl.Map({
       ...options,
       container,
     });

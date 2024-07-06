@@ -37,7 +37,7 @@ import { rDeepSearch } from "helpers/methods";
 import { darkenColor } from "helpers/color";
 import { Path } from "hooks/usePath";
 import BoundsMapping from "./BoundsMapping";
-import { Style } from "mapbox-gl";
+import { Style } from "maplibre-gl";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import ToggleButton from "@mui/material/ToggleButton";
 

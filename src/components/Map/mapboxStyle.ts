@@ -1,4 +1,4 @@
-import { Style } from "mapbox-gl";
+import { Style } from "maplibre-gl";
 
 const TILE_SERVER_URL = process.env.REACT_APP_TILE_SERVER_URL;
 

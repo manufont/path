@@ -1,4 +1,4 @@
-import mapboxgl, { GeoJSONSource, MapboxGeoJSONFeature, MapboxOptions } from "mapbox-gl";
+import maplibregl, { GeoJSONSource, MapboxGeoJSONFeature, MapboxOptions } from "maplibre-gl";
 
 export type MapState = {
   container: HTMLElement;
@@ -12,16 +12,16 @@ export type MapboxContextType = {
 
 export type DragEventListener<T extends GeoJSON.Feature = GeoJSON.Feature> = (
   e: DragEvent,
-  feature: T,
+  feature: T
 ) => void;
 
 export type WithFeatures = {
   features?: MapboxGeoJSONFeature[];
 };
 
-export type MapTouchEvent = mapboxgl.MapTouchEvent & WithFeatures;
+export type MapTouchEvent = maplibregl.MapTouchEvent & WithFeatures;
 
-export type MapMouseEvent = mapboxgl.MapMouseEvent & WithFeatures;
+export type MapMouseEvent = maplibregl.MapMouseEvent & WithFeatures;
 
 export type DragEvent = MapTouchEvent | MapMouseEvent;
 
@@ -30,16 +30,16 @@ export type GeoJSONFeatureRaw = {
   data: GeoJSON.Feature | GeoJSON.FeatureCollection;
 };
 
-export type EnhancedMap = mapboxgl.Map & {
+export type EnhancedMap = maplibregl.Map & {
   onLayerClick: (layerId: string, onClick: () => void) => void;
   makeLayerDraggable: <T extends GeoJSON.Feature = GeoJSON.Feature>(
     layerId: string,
     onDragMove: DragEventListener<T>,
     onDragEnd: DragEventListener<T>,
-    onClick?: DragEventListener<T>,
+    onClick?: DragEventListener<T>
   ) => void;
-  addLayerIfNotExist: mapboxgl.Map["addLayer"];
+  addLayerIfNotExist: maplibregl.Map["addLayer"];
   addOrUpdateSource: (id: string, source: GeoJSONFeatureRaw) => GeoJSONSource;
-  removeLayerIfExist: mapboxgl.Map["removeLayer"];
-  removeSourceIfExist: mapboxgl.Map["removeLayer"];
+  removeLayerIfExist: maplibregl.Map["removeLayer"];
+  removeSourceIfExist: maplibregl.Map["removeLayer"];
 };

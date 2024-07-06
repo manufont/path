@@ -1,8 +1,8 @@
-import mapboxgl, { GeoJSONSource, Point } from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
+import maplibregl, { GeoJSONSource, Point } from "maplibre-gl";
+import "maplibre-gl/dist/maplibre-gl.css";
 import { EnhancedMap, DragEvent, MapTouchEvent, DragEventListener } from "./types";
 
-const enhanceMap = (originalMap: mapboxgl.Map) => {
+const enhanceMap = (originalMap: maplibregl.Map) => {
   const map = originalMap as EnhancedMap;
   const canvas = map.getCanvas();
   map.onLayerClick = (layerId, onClick) => {
@@ -19,7 +19,7 @@ const enhanceMap = (originalMap: mapboxgl.Map) => {
     layerId: string,
     onDragMove: DragEventListener<T>,
     onDragEnd: DragEventListener<T>,
-    onClick?: DragEventListener<T>,
+    onClick?: DragEventListener<T>
   ) => {
     let feature: T | null = null;
     let point: Point | null = null;

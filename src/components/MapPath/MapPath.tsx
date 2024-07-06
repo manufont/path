@@ -4,7 +4,7 @@ import nearestPointOnLine from "@turf/nearest-point-on-line";
 import { DragEventListener, DragEvent, MapboxContext } from "contexts";
 import { last } from "helpers/methods";
 import { LonLat } from "helpers/geo";
-import { MapMouseEvent } from "mapbox-gl";
+import { MapMouseEvent } from "maplibre-gl";
 import { Path } from "hooks/usePath";
 
 type MapHoveredWaypointProps = {
