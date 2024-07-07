@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, Fragment } from "react";
 import styled from "@emotion/styled";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
@@ -7,6 +7,7 @@ import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
 import ClearIcon from "@mui/icons-material/Clear";
 import GpsFixedIcon from "@mui/icons-material/GpsFixed";
+import SettingsIcon from "@mui/icons-material/Settings";
 import queryString from "query-string";
 import cn from "classnames";
 
@@ -16,6 +17,7 @@ import { useResource, useDidUpdateEffect } from "hooks";
 
 import { LonLat } from "helpers/geo";
 import { ClassNames, css } from "@emotion/react";
+import { GlobalSettingsDialog } from "components";
 
 const PHOTON_URL = process.env.REACT_APP_PHOTON_URL;
 
@@ -34,6 +36,7 @@ const SearchBox = ({
   defaultSearchText,
   setLocation,
 }: SearchBoxProps) => {
+  const [showSettings, setShowSettings] = useState(false);
   const [searchUrl, setSearchUrl] = useState<string | null>(null);
   const [hideGeolocation, setHideGeolocation] = useState(!navigator.geolocation);
   const [photons, loading, error] = useResource<PhotonFeature[]>(searchUrl, parsePhotonResults);
@@ -76,72 +79,90 @@ const SearchBox = ({
     setSearchText("");
   };
 
+  const adornments = [
+    <IconButton onClick={() => setShowSettings(true)}>
+      <SettingsIcon />
+    </IconButton>,
+  ];
+
+  if (!hideGeolocation) {
+    adornments.unshift(
+      <IconButton onClick={geolocalize}>
+        <GpsFixedIcon />
+      </IconButton>
+    );
+  }
+
+  if (searchText) {
+    adornments.unshift(
+      <IconButton onClick={onInputClear}>
+        <ClearIcon />
+      </IconButton>
+    );
+  }
+
   return (
-    <Autocomplete
-      freeSolo
-      options={photons || []}
-      getOptionLabel={(option) => (typeof option === "string" ? option : photonToString(option))}
-      renderOption={(props, option) => {
-        const Icon = photonToIcon(option);
-        return (
-          <li {...props}>
-            <Icon
-              css={css`
-                vertical-align: text-bottom;
-              `}
-            />{" "}
-            {photonToString(option)}
-          </li>
-        );
-      }}
-      onInput={(e) => setSearchText((e.target as HTMLInputElement).value)}
-      onChange={(e, value) => {
-        setSearchText(photonToString(value as PhotonFeature));
-        onPlaceSelect(value as PhotonFeature);
-      }}
-      value={{ properties: { type: "label", name: searchText } } as PhotonFeature}
-      noOptionsText="No result found."
-      loading={loading}
-      renderInput={(params) => (
-        <ClassNames>
-          {({ css }) => (
-            <TextField
-              {...params}
-              InputProps={{
-                ...params.InputProps,
-                className: cn(
-                  params.InputProps.className,
-                  css`
-                    padding-right: 0 !important;
-                  `
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    {searchText && (
-                      <>
-                        <IconButton onClick={onInputClear}>
-                          <ClearIcon />
-                        </IconButton>
-                        {!hideGeolocation && <InputDivider orientation="vertical" />}
-                      </>
-                    )}
-                    {!hideGeolocation && (
-                      <IconButton onClick={geolocalize}>
-                        <GpsFixedIcon />
-                      </IconButton>
-                    )}
-                  </InputAdornment>
-                ),
-              }}
-              error={error !== null}
-              label={error === null ? "Enter your starting point" : String(error)}
-              margin="normal"
-              variant="outlined"
-            />
-          )}
-        </ClassNames>
-      )}
-    />
+    <>
+      <Autocomplete
+        freeSolo
+        options={photons || []}
+        getOptionLabel={(option) => (typeof option === "string" ? option : photonToString(option))}
+        renderOption={(props, option) => {
+          const Icon = photonToIcon(option);
+          return (
+            <li {...props}>
+              <Icon
+                css={css`
+                  vertical-align: text-bottom;
+                `}
+              />{" "}
+              {photonToString(option)}
+            </li>
+          );
+        }}
+        onInput={(e) => setSearchText((e.target as HTMLInputElement).value)}
+        onChange={(e, value) => {
+          setSearchText(photonToString(value as PhotonFeature));
+          onPlaceSelect(value as PhotonFeature);
+        }}
+        value={{ properties: { type: "label", name: searchText } } as PhotonFeature}
+        noOptionsText="No result found."
+        loading={loading}
+        renderInput={(params) => (
+          <ClassNames>
+            {({ css }) => (
+              <TextField
+                {...params}
+                InputProps={{
+                  ...params.InputProps,
+                  className: cn(
+                    params.InputProps.className,
+                    css`
+                      padding-right: 0 !important;
+                    `
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      {adornments.map((adornment, index) => (
+                        <Fragment key={index}>
+                          {index !== 0 && <InputDivider orientation="vertical" />}
+                          {adornment}
+                        </Fragment>
+                      ))}
+                    </InputAdornment>
+                  ),
+                }}
+                error={error !== null}
+                label={error === null ? "Enter your starting point" : String(error)}
+                margin="normal"
+                variant="outlined"
+              />
+            )}
+          </ClassNames>
+        )}
+      />
+      <GlobalSettingsDialog open={showSettings} onClose={() => setShowSettings(false)} />
+    </>
   );
 };
 

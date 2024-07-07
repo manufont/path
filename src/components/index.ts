@@ -1,3 +1,4 @@
+export { default as GlobalSettingsDialog } from "./GlobalSettingsDialog/GlobalSettingsDialog";
 export { default as Layout } from "./Layout/Layout";
 export { default as Map } from "./Map/Map";
 export { default as MapPath } from "./MapPath/MapPath";

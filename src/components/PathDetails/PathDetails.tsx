@@ -109,7 +109,7 @@ const PathDetails = ({
   };
 
   const onSettingsClick = () => {
-    setShowSettings(true);
+    setShowSettings(!showSettings);
     closeMenu();
   };
 
@@ -203,7 +203,7 @@ const PathDetails = ({
               <ListItemIcon>
                 <SettingsIcon />
               </ListItemIcon>
-              <ListItemText>{showSettings ? "Hide" : "Show"} settings</ListItemText>
+              <ListItemText>{showSettings ? "Hide" : "Path"} settings</ListItemText>
             </MenuItem>
             <MenuItem onClick={onClear}>
               <ListItemIcon>

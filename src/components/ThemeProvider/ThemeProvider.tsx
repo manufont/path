@@ -1,9 +1,10 @@
-import React, { PropsWithChildren, useEffect, useState } from "react";
+import React, { PropsWithChildren, useContext, useEffect, useState } from "react";
 import { ThemeProvider as MuiThemeProvider } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
 import green from "@mui/material/colors/green";
 import blueGrey from "@mui/material/colors/blueGrey";
 import CssBaseline from "@mui/material/CssBaseline";
+import { GlobalSettingsContext } from "contexts";
 
 const lightTheme = createTheme({
   palette: {
@@ -23,25 +24,43 @@ const darkTheme = createTheme({
 const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
 
 export const ThemeProvider = ({ children }: PropsWithChildren) => {
-  const [theme, setTheme] = useState(prefersDark.matches ? darkTheme : lightTheme);
+  // @ts-ignore
+  const { preferredTheme } = useContext(GlobalSettingsContext);
+  const defaultTheme =
+    preferredTheme === "auto"
+      ? prefersDark.matches
+        ? darkTheme
+        : lightTheme
+      : preferredTheme === "light"
+      ? lightTheme
+      : darkTheme;
+  const [theme, setTheme] = useState(defaultTheme);
 
   useEffect(() => {
-    const onPrefersDarkChange = (e: MediaQueryListEvent) => {
-      setTheme(e.matches ? darkTheme : lightTheme);
-    };
-    try {
-      prefersDark.addEventListener("change", onPrefersDarkChange);
-    } catch (e) {
-      console.error(e);
-    }
-    return () => {
+    if (preferredTheme === "light") {
+      setTheme(lightTheme);
+    } else if (preferredTheme === "dark") {
+      setTheme(darkTheme);
+    } else {
+      if (preferredTheme !== "auto") return;
+      setTheme(prefersDark.matches ? darkTheme : lightTheme);
+      const onPrefersDarkChange = (e: MediaQueryListEvent) => {
+        setTheme(e.matches ? darkTheme : lightTheme);
+      };
       try {
-        prefersDark.removeEventListener("change", onPrefersDarkChange);
+        prefersDark.addEventListener("change", onPrefersDarkChange);
       } catch (e) {
         console.error(e);
       }
-    };
-  }, [setTheme]);
+      return () => {
+        try {
+          prefersDark.removeEventListener("change", onPrefersDarkChange);
+        } catch (e) {
+          console.error(e);
+        }
+      };
+    }
+  }, [preferredTheme, setTheme]);
 
   return (
     <MuiThemeProvider theme={theme}>

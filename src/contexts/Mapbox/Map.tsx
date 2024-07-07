@@ -1,6 +1,7 @@
 import { MapboxOptions } from "maplibre-gl";
 import { useCallback, useContext } from "react";
 import MapboxContext from "./context";
+import { useDidUpdateEffect } from "hooks";
 
 type MapProps = React.HTMLAttributes<HTMLDivElement> &
   React.PropsWithChildren<{
@@ -18,6 +19,10 @@ const Map = ({ children, options, ...containerProps }: MapProps) => {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useDidUpdateEffect(() => {
+    if (map && options.style) map.setStyle(options.style);
+  }, [options.style]);
 
   return (
     <div ref={containerRef} {...containerProps}>
