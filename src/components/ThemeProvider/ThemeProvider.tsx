@@ -1,4 +1,6 @@
 import React, { PropsWithChildren, useContext, useEffect, useState } from "react";
+import { Link as RouterLink, LinkProps as RouterLinkProps } from "react-router-dom";
+import { LinkProps } from "@mui/material/Link";
 import { ThemeProvider as MuiThemeProvider } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
 import green from "@mui/material/colors/green";
@@ -6,11 +8,34 @@ import blueGrey from "@mui/material/colors/blueGrey";
 import CssBaseline from "@mui/material/CssBaseline";
 import { GlobalSettingsContext } from "contexts";
 
+const LinkBehavior = React.forwardRef<
+  HTMLAnchorElement,
+  Omit<RouterLinkProps, "to"> & { href: RouterLinkProps["to"] }
+>((props, ref) => {
+  const { href, ...other } = props;
+  // Map href (Material UI) -> to (react-router)
+  return <RouterLink ref={ref} to={href} {...other} />;
+});
+
+const components = {
+  MuiLink: {
+    defaultProps: {
+      component: LinkBehavior,
+    } as LinkProps,
+  },
+  MuiButtonBase: {
+    defaultProps: {
+      LinkComponent: LinkBehavior,
+    },
+  },
+};
+
 const lightTheme = createTheme({
   palette: {
     primary: green,
     secondary: blueGrey,
   },
+  components,
 });
 
 const darkTheme = createTheme({
@@ -19,6 +44,7 @@ const darkTheme = createTheme({
     primary: green,
     secondary: blueGrey,
   },
+  components,
 });
 
 const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");

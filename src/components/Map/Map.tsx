@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import styled from "@emotion/styled";
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
@@ -14,8 +14,8 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import { useTheme } from "@mui/material/styles";
 
-import { SearchBox, MapPath, PathDetails } from "components";
-import { MapboxMap, MapboxProvider } from "contexts";
+import { SearchBox, MapPath, PathDetails, Library } from "components";
+import { LibraryContext, MapboxMap, MapboxProvider } from "contexts";
 import { useSearchState, usePath, useTitle, useDidUpdateEffect } from "hooks";
 import {
   lonLatEncoder,
@@ -194,6 +194,27 @@ const Map = () => {
   };
 
   const [showSettings, setShowSettings] = useState(false);
+  const [showLibrary, setShowLibrary] = useState(false);
+
+  useEffect(() => {
+    if (showSettings) {
+      setShowLibrary(false);
+    }
+  }, [showSettings]);
+
+  useEffect(() => {
+    if (showLibrary) {
+      setShowSettings(false);
+    }
+  }, [showLibrary]);
+
+  const { storedPaths } = useContext(LibraryContext);
+
+  useEffect(() => {
+    if (storedPaths?.length === 0 && showLibrary) {
+      setShowLibrary(false);
+    }
+  }, [showLibrary, storedPaths?.length]);
 
   return (
     <MapContainerDiv>
@@ -209,7 +230,7 @@ const Map = () => {
           </StyledCardContent>
         </Card>
         {location && (
-          <ExpandableBox>
+          <ExpandableCard>
             <HeaderDiv>
               <Tabs
                 value={mode}
@@ -251,7 +272,11 @@ const Map = () => {
               showSettings={showSettings}
               setShowSettings={setShowSettings}
             />
-          </ExpandableBox>
+          </ExpandableCard>
+        )}
+
+        {(path || storedPaths.length > 0) && (
+          <Library path={path} showLibrary={showLibrary} setShowLibrary={setShowLibrary} />
         )}
 
         <Snackbar open={snackbarOpen}>
@@ -319,9 +344,8 @@ const BoxesDiv = styled.div`
   }
 `;
 
-const ExpandableBox = styled(Card)`
+const ExpandableCard = styled(Card)`
   margin-top: 16px;
-  height: 108px;
   overflow: visible;
 
   @media screen and (max-width: 640px) {

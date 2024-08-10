@@ -2,7 +2,7 @@ import { BrowserRouter } from "react-router-dom";
 import { StylesProvider } from "@mui/styles";
 
 import { Layout, ThemeProvider } from "components";
-import { GlobalSettingsProvider } from "contexts";
+import { GlobalSettingsProvider, LibraryProvider } from "contexts";
 
 const App = () => {
   return (
@@ -10,7 +10,9 @@ const App = () => {
       <GlobalSettingsProvider>
         <ThemeProvider>
           <StylesProvider injectFirst>
-            <Layout />
+            <LibraryProvider>
+              <Layout />
+            </LibraryProvider>
           </StylesProvider>
         </ThemeProvider>
       </GlobalSettingsProvider>

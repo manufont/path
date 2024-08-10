@@ -112,7 +112,7 @@ export const pathEncoder: Encoder<LonLat[]> = {
   decode: (str) => pDecode(uriAtob(str)),
 };
 
-export const getWaypointsFromPath = (path: Path) =>
+export const getWaypointsFromPath = (path: Pick<Path, "trip">) =>
   pDecode(
     pEncode(
       path.trip.legs

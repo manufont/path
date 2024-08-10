@@ -49,8 +49,11 @@ export const rDeepSearch = (elt: object, lambda: (str: any) => any): object => {
         ...acc,
         [key]: rDeepSearch(value, lambda),
       }),
-      {},
+      {}
     );
   }
   return lambda(elt);
 };
+
+export const isDefined = <T>(value: T | undefined | null): value is T =>
+  value !== null && value !== undefined;
