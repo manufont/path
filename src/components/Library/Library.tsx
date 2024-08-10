@@ -128,6 +128,7 @@ const ExpandableCard = styled(Card)`
   @media screen and (max-width: 640px) {
     bottom: 0;
     margin-top: -6px;
+    height: 6px;
   }
 `;
 
