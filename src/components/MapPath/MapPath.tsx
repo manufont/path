@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState, useCallback } from "react";
+import { useContext, useEffect, useState, useCallback, Fragment } from "react";
 import nearestPointOnLine from "@turf/nearest-point-on-line";
 
 import { DragEventListener, DragEvent, MapboxContext } from "contexts";
@@ -6,6 +6,7 @@ import { last } from "helpers/methods";
 import { LonLat } from "helpers/geo";
 import { MapMouseEvent } from "maplibre-gl";
 import { Path } from "hooks/usePath";
+import { useTheme } from "@mui/material/styles";
 
 type MapHoveredWaypointProps = {
   feature: GeoJSON.Feature<GeoJSON.Point>;
@@ -420,6 +421,7 @@ type MapPathProps = {
 const MapPath = ({ location, setLocation, waypoints, setWaypoints, path }: MapPathProps) => {
   const { map } = useContext(MapboxContext);
   const [hoveredFeature, setHoveredFeature] = useState<HoveredFeature | null>(null);
+  const theme = useTheme();
 
   useEffect(() => {
     if (!map) return;
@@ -462,7 +464,7 @@ const MapPath = ({ location, setLocation, waypoints, setWaypoints, path }: MapPa
 
   if (!location) return null;
   return (
-    <>
+    <Fragment key={theme.palette.mode}>
       <MapWaypoints waypoints={waypoints} setWaypoints={setWaypoints} />
       <MapLocation location={location} setLocation={setLocation} />
       {waypoints.length > 0 && (
@@ -473,7 +475,7 @@ const MapPath = ({ location, setLocation, waypoints, setWaypoints, path }: MapPa
           )}
         </>
       )}
-    </>
+    </Fragment>
   );
 };
 
