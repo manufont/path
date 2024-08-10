@@ -46,9 +46,7 @@ const Library = ({ showLibrary, setShowLibrary, path }: LibraryProps) => {
                   margin-top: 0 !important;
                   margin-bottom: 0 !important;
                 `,
-                gutters: css`
-                  padding: 0 8px;
-                `,
+                gutters: css``,
               }}
             >
               <SummaryDiv>

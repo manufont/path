@@ -104,12 +104,27 @@ export const addBoundsMargin = (bounds: Bounds, relativeMargin: number): Bounds 
 const pEncode = (points: LonLat[]) => polyline.encode(points, PATH_PRECISION);
 const pDecode = (str: string): LonLat[] => polyline.decode(str, PATH_PRECISION);
 
-const uriBtoa = (str: string) => btoa(str).replace(/=/g, "~").replace(/\//g, ".");
-const uriAtob = (str: string) => atob(str.replace(/~/g, " ").replace(/\./g, "/"));
+const uriBtoa = (str: string) =>
+  btoa(str).replace(/=/g, "~").replace(/\//g, ".").replace(/\+/g, "-");
+const uriAtob = (str: string) =>
+  atob(str.replace(/~/g, " ").replace(/\./g, "/").replace(/-/g, "+"));
+const uriAtobOld = (str: string) => atob(str.replace(/~/g, " ").replace(/\./g, "/"));
 
 export const pathEncoder: Encoder<LonLat[]> = {
   encode: (path) => uriBtoa(pEncode(path)),
-  decode: (str) => pDecode(uriAtob(str)),
+  decode: (str) => {
+    try {
+      return pDecode(uriAtob(str));
+    } catch (e) {
+      console.warn("Couldn't decode path. Trying fallback mode 1...");
+    }
+    try {
+      return pDecode(uriAtobOld(str));
+    } catch (e) {
+      console.warn("Couldn't decode path. Trying fallback mode 2...");
+    }
+    return pDecode(uriAtobOld(str.replace(/ /g, "+")));
+  },
 };
 
 export const getWaypointsFromPath = (path: Pick<Path, "trip">) =>

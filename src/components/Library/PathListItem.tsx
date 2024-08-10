@@ -70,7 +70,12 @@ const PathListItem = ({
         href={`/${path.pathSearch}`}
       >
         <ListItemAvatar>
-          <PathBubble currentPath={currentPath} hoveredPathId={hoveredPathId} path={path} />
+          <PathBubble
+            currentPath={currentPath}
+            hoveredPathId={hoveredPathId}
+            path={path}
+            size={64}
+          />
         </ListItemAvatar>
         <ListItemText
           primary={path.trip.summary.length.toFixed(1) + " km"}

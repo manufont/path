@@ -63,6 +63,7 @@ type PathBubbleProps = {
   showAddButton?: boolean;
   hoveredPathId: string | null;
   setHoveredPathId?: (path: string | null) => void;
+  size?: number;
 };
 
 const PathBubble = ({
@@ -72,6 +73,7 @@ const PathBubble = ({
   showAddButton,
   hoveredPathId,
   setHoveredPathId,
+  size = 44,
 }: PathBubbleProps) => {
   const points = "svgPath" in path ? path.svgPath : getSvgPath(path);
   const theme = useTheme();
@@ -99,7 +101,7 @@ const PathBubble = ({
 
   return (
     <Root path={path} onClick={onClick} onMouseOver={onMouseOver} onMouseLeave={onMouseLeave}>
-      <StyledSvg viewBox="-0.4 -0.4 1.8 1.8" width={48} height={48} onClick={onClick}>
+      <StyledSvg viewBox="-0.4 -0.4 1.8 1.8" width={size} height={size} onClick={onClick}>
         <circle
           className="outline"
           cx={0.5}
