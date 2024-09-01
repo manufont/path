@@ -19,7 +19,7 @@ import { LibraryContext, MapboxMap, MapboxProvider } from "contexts";
 import { useSearchState, usePath, useTitle, useDidUpdateEffect } from "hooks";
 import {
   lonLatEncoder,
-  franceBounds,
+  europeBounds,
   boundsCenter,
   boundsFromPoint,
   getWaypointsFromPath,
@@ -123,7 +123,7 @@ const Map = () => {
   const theme = useTheme();
 
   const defaultBounds = useMemo(() => {
-    if (!location) return franceBounds;
+    if (!location) return europeBounds;
     if (waypoints.length === 0) return boundsFromPoint(location);
     return addBoundsMargin(getBoundsFromPoints([location, ...waypoints]), 0.5);
   }, [location, waypoints]);

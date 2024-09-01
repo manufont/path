@@ -39,9 +39,9 @@ export const boundsEncoder: Encoder<Bounds> = {
   decode: (encodedBounds) => encodedBounds.split("~").map(lonLatEncoder.decode) as Bounds,
 };
 
-export const franceBounds: Bounds = [
-  [-5.5591, 41.31433],
-  [9.6625, 51.1242],
+export const europeBounds: Bounds = [
+  [-12.5, 34.5],
+  [33.6, 61.3],
 ];
 
 export const distance = (pointA: LonLat, pointB: LonLat) => {
