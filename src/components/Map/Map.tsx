@@ -136,7 +136,7 @@ const Map = () => {
     // If there's a big enough difference, we center on path bounds
     const prev = [previousLocation, ...(previousWaypoints || [])].filter(isDefined);
     const next = [location, ...waypoints].filter(isDefined);
-    if (pointsDiff(prev, next) > 1) {
+    if (next.length > 1 && pointsDiff(prev, next) > 1) {
       setBounds(addBoundsMargin(getBoundsFromPoints(next), 0.5));
     }
   }, [location, previousLocation, previousWaypoints, waypoints]);
@@ -189,11 +189,14 @@ const Map = () => {
     setBounds(newBounds);
   };
 
-  const setLocationFromPoint = async (location: LonLat | null) => {
-    setLocation(location);
-    if (!location) return;
-    setBounds(boundsFromPoint(location));
-    const photon = await getPhotonFromLocation(location);
+  const setLocationFromPoint = async (newLocation: LonLat | null) => {
+    setLocation(newLocation);
+    if (!newLocation) return;
+    if (!location) {
+      //we don't want to recenter if the location has already been set
+      setBounds(boundsFromPoint(newLocation));
+    }
+    const photon = await getPhotonFromLocation(newLocation);
     if (photon) {
       setLocationText(photonToString(photon));
     }
