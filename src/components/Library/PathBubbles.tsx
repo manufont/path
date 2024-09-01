@@ -5,6 +5,23 @@ import { Path } from "hooks/usePath";
 import PathBubble from "./PathBubble";
 import { useState, useRef, useEffect } from "react";
 import { css, useTheme } from "@mui/material/styles";
+import { useMounted } from "hooks";
+
+const BUBBLE_TRANSITION_SIZE = 100;
+
+const BubbleWrapper = ({
+  path,
+  currentPath,
+  ...otherProps
+}: Omit<PathBubblesProps, "paths"> & { path: StoredPath }) => {
+  const mounted = useMounted();
+
+  return (
+    <BubbleWrapperRoot id={`path-${path.id}`} mounted={mounted}>
+      <PathBubble currentPath={currentPath} {...otherProps} path={path} />
+    </BubbleWrapperRoot>
+  );
+};
 
 type PathBubblesProps = {
   currentPath: Path | null;
@@ -53,11 +70,13 @@ const PathBubbles = ({ paths, currentPath, ...otherProps }: PathBubblesProps) =>
   const currentPathIsStored = currentPath && paths.find(({ id }) => id === currentPath.id);
 
   useEffect(() => {
-    if (!currentPath) return;
+    const scrollElt = scrollRef.current;
+    if (!currentPath || !scrollElt) return;
     // we auto scroll on the current path if present
     const pathBubble = document.getElementById(`path-${currentPath.id}`);
     if (!pathBubble) return;
     pathBubble.scrollIntoView();
+    scrollElt.scrollLeft -= BUBBLE_TRANSITION_SIZE; // we shift by 100 to compensate for the translateX
   }, [currentPath, currentPathIsStored]);
 
   return (
@@ -69,9 +88,7 @@ const PathBubbles = ({ paths, currentPath, ...otherProps }: PathBubblesProps) =>
     >
       <ScrollablePart ref={scrollRef} onScroll={onScroll}>
         {paths.map((path) => (
-          <BubbleWrapper key={path.id} id={`path-${path.id}`}>
-            <PathBubble currentPath={currentPath} {...otherProps} path={path} />
-          </BubbleWrapper>
+          <BubbleWrapper key={path.id} path={path} currentPath={currentPath} {...otherProps} />
         ))}
       </ScrollablePart>
       <EdgeRight
@@ -95,6 +112,8 @@ const Root = styled.div`
 `;
 
 const ScrollablePart = styled.div`
+  padding: 4px;
+  margin: -4px; // We add margin for bubble transform scale effect
   display: flex;
   position: absolute;
   top: 0;
@@ -108,26 +127,39 @@ const ScrollablePart = styled.div`
 const Edge = styled.div`
   position: absolute;
   width: ${EDGE_WIDTH}px;
-  top: 0;
-  bottom: 0;
+  top: -4px;
+  bottom: -4px;
 `;
 
 const EdgeRight = styled(Edge)`
-  right: 0;
+  right: -4px;
   background: linear-gradient(90deg, var(--gradient-from) 0%, var(--gradient-to) 100%);
   transform-origin: right;
 `;
 
 const EdgeLeft = styled(Edge)`
-  left: 0;
+  left: -4px;
   background: linear-gradient(270deg, var(--gradient-from) 0%, var(--gradient-to) 100%);
   transform-origin: left;
 `;
 
-const BubbleWrapper = styled.div`
+const BubbleWrapperRoot = styled.div<{ mounted: boolean }>`
   &:not(:first-of-type) {
     margin-left: -10px;
   }
+
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  transform: translateX(${BUBBLE_TRANSITION_SIZE}px);
+  opacity: 0;
+
+  ${({ mounted }) => {
+    if (!mounted) return;
+
+    return `
+      transform: translateX(0);
+      opacity: 1;
+    `;
+  }}
 `;
 
 export default PathBubbles;

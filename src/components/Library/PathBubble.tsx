@@ -9,6 +9,7 @@ import { Path } from "hooks/usePath";
 import { Typography } from "@mui/material";
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
+import { SerializedStyles } from "@emotion/react";
 
 const Root = ({
   path,
@@ -17,6 +18,7 @@ const Root = ({
   ...otherProps
 }: Pick<PathBubbleProps, "path" | "onClick"> &
   Pick<React.HTMLProps<HTMLElement>, "onMouseOver" | "onMouseLeave"> & {
+    css: SerializedStyles;
     children: React.ReactNode;
   }) => {
   if (onClick || !("pathSearch" in path)) {
@@ -100,7 +102,19 @@ const PathBubble = ({
   );
 
   return (
-    <Root path={path} onClick={onClick} onMouseOver={onMouseOver} onMouseLeave={onMouseLeave}>
+    <Root
+      path={path}
+      onClick={onClick}
+      onMouseOver={onMouseOver}
+      onMouseLeave={onMouseLeave}
+      css={css`
+        ${isHovered
+          ? `
+            transform: scale(1.1);
+          `
+          : ""}
+      `}
+    >
       <StyledSvg viewBox="-0.4 -0.4 1.8 1.8" width={size} height={size} onClick={onClick}>
         <circle
           className="outline"
@@ -158,10 +172,12 @@ const SideIcon = styled(AddIcon)`
 
 const RootDiv = styled.div`
   position: relative;
+  transition: transform 0.3s ease;
 `;
 
 const RootLink = styled(Link)`
   position: relative;
+  transition: transform 0.3s ease;
   text-decoration: none;
   color: inherit;
   display: block;
