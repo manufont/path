@@ -16,7 +16,7 @@ import { useTheme } from "@mui/material/styles";
 
 import { SearchBox, MapPath, PathDetails, Library } from "components";
 import { LibraryContext, MapboxMap, MapboxProvider } from "contexts";
-import { useSearchState, usePath, useTitle, useDidUpdateEffect } from "hooks";
+import { useSearchState, usePath, useTitle, useDidUpdateEffect, usePrevious } from "hooks";
 import {
   lonLatEncoder,
   europeBounds,
@@ -29,11 +29,12 @@ import {
   Encoder,
   Bounds,
   LonLat,
+  pointsDiff,
 } from "helpers/geo";
 import { photonToString, getPhotonFromLocation, PhotonFeature } from "helpers/photon";
 
 import mapboxLightStyle from "./mapboxStyle";
-import { rDeepSearch } from "helpers/methods";
+import { isDefined, rDeepSearch } from "helpers/methods";
 import { darkenColor } from "helpers/color";
 import { Path } from "hooks/usePath";
 import BoundsMapping from "./BoundsMapping";
@@ -127,6 +128,18 @@ const Map = () => {
     if (waypoints.length === 0) return boundsFromPoint(location);
     return addBoundsMargin(getBoundsFromPoints([location, ...waypoints]), 0.5);
   }, [location, waypoints]);
+
+  const previousWaypoints = usePrevious(waypoints);
+  const previousLocation = usePrevious(location);
+
+  useEffect(() => {
+    // If there's a big enough difference, we center on path bounds
+    const prev = [previousLocation, ...(previousWaypoints || [])].filter(isDefined);
+    const next = [location, ...waypoints].filter(isDefined);
+    if (pointsDiff(prev, next) > 1) {
+      setBounds(addBoundsMargin(getBoundsFromPoints(next), 0.5));
+    }
+  }, [location, previousLocation, previousWaypoints, waypoints]);
 
   const [bounds, setBounds] = useState<Bounds>(defaultBounds);
 

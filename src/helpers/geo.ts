@@ -53,6 +53,14 @@ export const distance = (pointA: LonLat, pointB: LonLat) => {
 export const closestPoint = (polyline: LonLat[], point: LonLat) =>
   minBy(polyline, (_: LonLat) => distance(_, point));
 
+export const pointsDiff = (pointsA: LonLat[], pointsB: LonLat[]) => {
+  let diff = Math.abs(pointsA.length - pointsB.length);
+  for (let i = 0; i < Math.min(pointsA.length, pointsB.length); ++i) {
+    if (!lonLatCmp(pointsA[i], pointsB[i])) diff++;
+  }
+  return diff;
+};
+
 export const pointsCmp = (pointsA: LonLat[], pointsB: LonLat[]) => {
   if (pointsA.length !== pointsB.length) return false;
   for (let i = 0; i < pointsA.length; ++i) {
