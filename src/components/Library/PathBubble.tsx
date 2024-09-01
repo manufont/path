@@ -108,7 +108,7 @@ const PathBubble = ({
       onMouseOver={onMouseOver}
       onMouseLeave={onMouseLeave}
       css={css`
-        ${isHovered
+        ${isHovered || isCurrentPath
           ? `
             transform: scale(1.1);
           `

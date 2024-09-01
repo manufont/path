@@ -16,8 +16,16 @@ const BubbleWrapper = ({
 }: Omit<PathBubblesProps, "paths"> & { path: StoredPath }) => {
   const mounted = useMounted();
 
+  const isHovered = otherProps.hoveredPathId === path.id;
+  const isCurrentPath = currentPath?.id === path.id;
+
   return (
-    <BubbleWrapperRoot id={`path-${path.id}`} mounted={mounted}>
+    <BubbleWrapperRoot
+      id={`path-${path.id}`}
+      mounted={mounted}
+      isHovered={isHovered}
+      isCurrentPath={isCurrentPath}
+    >
       <PathBubble currentPath={currentPath} {...otherProps} path={path} />
     </BubbleWrapperRoot>
   );
@@ -143,7 +151,11 @@ const EdgeLeft = styled(Edge)`
   transform-origin: left;
 `;
 
-const BubbleWrapperRoot = styled.div<{ mounted: boolean }>`
+const BubbleWrapperRoot = styled.div<{
+  mounted: boolean;
+  isHovered: boolean;
+  isCurrentPath: boolean;
+}>`
   &:not(:first-of-type) {
     margin-left: -10px;
   }
@@ -152,14 +164,15 @@ const BubbleWrapperRoot = styled.div<{ mounted: boolean }>`
   transform: translateX(${BUBBLE_TRANSITION_SIZE}px);
   opacity: 0;
 
+  z-index: ${({ isHovered, isCurrentPath }) => (isHovered ? 2 : isCurrentPath ? 1 : 0)};
   ${({ mounted }) => {
     if (!mounted) return;
 
     return `
-      transform: translateX(0);
-      opacity: 1;
-    `;
-  }}
+    transform: translateX(0);
+    opacity: 1;
+  `;
+  }};
 `;
 
 export default PathBubbles;
